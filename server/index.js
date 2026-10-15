@@ -32,7 +32,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static React build and uploaded images
-const clientDist = path.join(__dirname, '..', 'client', 'dist');
+const clientDist = fs.existsSync(path.join(__dirname, '..', 'dist'))
+  ? path.join(__dirname, '..', 'dist')
+  : path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));
 app.use('/uploads', express.static(uploadDir));
 

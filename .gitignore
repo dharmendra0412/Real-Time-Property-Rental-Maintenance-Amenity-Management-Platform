@@ -6,5 +6,6 @@ uploads/*
 !uploads/.gitkeep
 client/node_modules
 client/dist
+dist
 .DS_Store
 *.log

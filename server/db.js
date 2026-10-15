@@ -3,20 +3,19 @@ const { Pool } = require('pg');
 
 const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  console.error('FATAL ERROR: DATABASE_URL is not defined in .env! A valid PostgreSQL connection string is required.');
-  process.exit(1);
+let pool = null;
+if (databaseUrl) {
+  console.log('[Database] Connecting to PostgreSQL Database via pg Pool...');
+  pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false }
+  });
+  pool.on('error', (err) => {
+    console.error('[PostgreSQL Pool Error]:', err.message);
+  });
+} else {
+  console.error('[Database Fatal]: DATABASE_URL is missing in environment variables!');
 }
-
-console.log('[Database] Connecting to PostgreSQL Database via pg Pool...');
-const pool = new Pool({
-  connectionString: databaseUrl,
-  ssl: databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false }
-});
-
-pool.on('error', (err) => {
-  console.error('[PostgreSQL Pool Error]:', err.message);
-});
 
 // Helper to convert standard '?' placeholders to PostgreSQL '$1, $2, ...'
 function formatPgQuery(sql) {
@@ -87,7 +86,10 @@ const db = {
 };
 
 async function initializeSchema() {
-  // 1. Users Table
+  if (!pool) {
+    console.warn('[Database] Schema initialization skipped: DATABASE_URL is not set.');
+    return;
+  }
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id VARCHAR(64) PRIMARY KEY,

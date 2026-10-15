@@ -53,12 +53,13 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const hasDb = !!process.env.DATABASE_URL;
   res.json({
-    status: 'ONLINE',
+    status: hasDb ? 'ONLINE' : 'CONFIG_ERROR',
+    database: hasDb ? 'PostgreSQL (Connected)' : 'DATABASE_URL Missing in Environment',
     service: 'Real-Time Property Rental, Maintenance & Amenity Management Platform',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    realtime_clients_connected: io.engine.clientsCount
+    uptime: process.uptime()
   });
 });
 

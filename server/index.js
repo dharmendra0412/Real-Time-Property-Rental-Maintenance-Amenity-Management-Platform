@@ -38,21 +38,21 @@ const clientDist = fs.existsSync(path.join(__dirname, '..', 'dist'))
 app.use(express.static(clientDist));
 app.use('/uploads', express.static(uploadDir));
 
-// Route Handlers
+// Route Handlers (Support both /api/* and /* for Vercel Serverless Rewrites)
 const authRoutes = require('./routes/auth');
 const propertiesRoutes = require('./routes/properties');
 const maintenanceRoutes = require('./routes/maintenance');
 const amenitiesRoutes = require('./routes/amenities');
 const dashboardRoutes = require('./routes/dashboard');
 
-app.use('/api/auth', authRoutes);
-app.use('/api/properties', propertiesRoutes);
-app.use('/api/maintenance', maintenanceRoutes);
-app.use('/api/amenities', amenitiesRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/properties', '/properties'], propertiesRoutes);
+app.use(['/api/maintenance', '/maintenance'], maintenanceRoutes);
+app.use(['/api/amenities', '/amenities'], amenitiesRoutes);
+app.use(['/api/dashboard', '/dashboard'], dashboardRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+const healthHandler = (req, res) => {
   const hasDb = !!process.env.DATABASE_URL;
   res.json({
     status: hasDb ? 'ONLINE' : 'CONFIG_ERROR',
@@ -61,7 +61,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
-});
+};
+app.get(['/api/health', '/health'], healthHandler);
 
 // Socket.io Real-Time Event Management
 io.on('connection', (socket) => {

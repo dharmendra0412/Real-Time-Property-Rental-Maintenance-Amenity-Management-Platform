@@ -29,17 +29,16 @@ export const API = {
     }
 
     const config = { ...options, headers };
-    const response = await fetch(url, config);
-
+    const text = await response.text();
     let data;
     try {
-      data = await response.json();
+      data = JSON.parse(text);
     } catch {
-      data = { error: 'Failed to parse JSON response' };
+      data = { error: response.status === 404 ? 'API route not found (HTTP 404)' : `Server Error (HTTP ${response.status})` };
     }
 
     if (!response.ok) {
-      throw new Error(data.error || `HTTP ${response.status}`);
+      throw new Error(data.error || `HTTP ${response.status}: Request failed`);
     }
 
     return data;

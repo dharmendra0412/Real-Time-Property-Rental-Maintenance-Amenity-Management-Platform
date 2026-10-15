@@ -25,6 +25,7 @@ import {
   X,
   FileText
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import { API } from './api';
 
 export default function App() {
@@ -1627,6 +1628,7 @@ export default function App() {
           </div>
         ))}
       </div>
+      <Analytics />
     </div>
   );
 }

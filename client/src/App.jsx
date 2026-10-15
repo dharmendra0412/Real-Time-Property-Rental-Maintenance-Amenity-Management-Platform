@@ -32,6 +32,7 @@ export default function App() {
   const [userContext, setUserContext] = useState({});
   const [activeTab, setActiveTab] = useState('dashboard');
   const [liveConnected, setLiveConnected] = useState(false);
+  const [cloudOnline, setCloudOnline] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   // Dashboard Stats State
@@ -110,58 +111,92 @@ export default function App() {
         });
     }
 
-    // Connect WebSocket
-    const socket = io();
+    // Check Cloud Backend Health (Vercel Serverless / Cloud Support)
+    const verifyHealth = () => {
+      fetch('/api/health')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.status === 'ONLINE') {
+            setCloudOnline(true);
+          } else {
+            setCloudOnline(false);
+            if (data && data.status === 'CONFIG_ERROR') {
+              addToast('DATABASE_URL missing in Vercel Environment Variables!', 'warning');
+            }
+          }
+        })
+        .catch(() => setCloudOnline(false));
+    };
 
-    socket.on('connect', () => {
-      setLiveConnected(true);
-    });
+    verifyHealth();
+    const healthTimer = setInterval(verifyHealth, 15000);
 
-    socket.on('disconnect', () => {
-      setLiveConnected(false);
-    });
+    // Connect WebSocket (falls back gracefully on Serverless)
+    let socket = null;
+    try {
+      socket = io({ transports: ['websocket', 'polling'], timeout: 4000 });
 
-    // Real-time Event listeners
-    socket.on('maintenance:created', data => {
-      playChime(520, 660);
-      addToast(`New ticket reported: "${data.title}" (${data.priority})`, 'info');
-      refreshAll();
-    });
+      socket.on('connect', () => {
+        setLiveConnected(true);
+      });
 
-    socket.on('maintenance:updated', data => {
-      playChime(660, 880);
-      addToast(`Ticket #${data.id.slice(-4)} status updated to ${data.status}`, 'success');
-      refreshAll();
-    });
+      socket.on('disconnect', () => {
+        setLiveConnected(false);
+      });
 
-    socket.on('maintenance:rated', data => {
-      playChime(700, 900);
-      addToast(`Tenant rated Ticket #${data.id.slice(-4)}: ${data.satisfaction_rating} ★`, 'success');
-      refreshAll();
-    });
+      // Real-time Event listeners
+      socket.on('maintenance:created', data => {
+        playChime(520, 660);
+        addToast(`New ticket reported: "${data.title}" (${data.priority})`, 'info');
+        refreshAll();
+      });
 
-    socket.on('amenity:booked', data => {
-      playChime(440, 550);
-      addToast(`Slot reserved for ${data.amenity_name} (${data.start_time} - ${data.end_time})`, 'info');
-      refreshAll();
-    });
+      socket.on('maintenance:updated', data => {
+        playChime(660, 880);
+        addToast(`Ticket #${data.id.slice(-4)} status updated to ${data.status}`, 'success');
+        refreshAll();
+      });
 
-    socket.on('amenity:checked_in', data => {
-      addToast(`Checked in to ${data.amenity_name}`, 'success');
-      refreshAll();
-    });
+      socket.on('maintenance:rated', data => {
+        playChime(700, 900);
+        addToast(`Tenant rated Ticket #${data.id.slice(-4)}: ${data.satisfaction_rating} ★`, 'success');
+        refreshAll();
+      });
 
-    socket.on('amenity:checked_out', data => {
-      addToast(`Checked out of ${data.amenity_name}`, 'success');
-      refreshAll();
-    });
+      socket.on('amenity:booked', data => {
+        playChime(440, 550);
+        addToast(`Slot reserved for ${data.amenity_name} (${data.start_time} - ${data.end_time})`, 'info');
+        refreshAll();
+      });
 
-    socket.on('amenity:cancelled', data => {
-      addToast(`Reservation cancelled for ${data.amenity_name} - Slot released`, 'info');
-      refreshAll();
-    });
+      socket.on('amenity:checked_in', data => {
+        addToast(`Checked in to ${data.amenity_name}`, 'success');
+        refreshAll();
+      });
 
-    return () => socket.disconnect();
+      socket.on('amenity:checked_out', data => {
+        addToast(`Checked out of ${data.amenity_name}`, 'success');
+        refreshAll();
+      });
+
+      socket.on('amenity:cancelled', data => {
+        addToast(`Reservation cancelled for ${data.amenity_name} - Slot released`, 'info');
+        refreshAll();
+      });
+    } catch {}
+
+    // Serverless Auto-Refresh Fallback (runs every 10s if websocket is not active)
+    const pollTimer = setInterval(() => {
+      if (!liveConnected) {
+        refreshAll();
+      }
+    }, 10000);
+
+    return () => {
+      clearInterval(healthTimer);
+      clearInterval(pollTimer);
+      if (socket) socket.disconnect();
+    };
   }, []);
 
   // 2. Fetch Data when Active Tab or User changes
@@ -461,9 +496,19 @@ export default function App() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-            <span className={`w-2 h-2 rounded-full ${liveConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
-            {liveConnected ? 'LIVE SYNC' : 'OFFLINE'}
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${
+            liveConnected || cloudOnline 
+              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
+              : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${
+              liveConnected 
+                ? 'bg-emerald-400 animate-pulse' 
+                : cloudOnline 
+                  ? 'bg-emerald-400' 
+                  : 'bg-rose-500'
+            }`} />
+            {liveConnected ? 'LIVE SYNC' : cloudOnline ? 'CLOUD ONLINE' : 'OFFLINE'}
           </div>
 
           {currentUser ? (

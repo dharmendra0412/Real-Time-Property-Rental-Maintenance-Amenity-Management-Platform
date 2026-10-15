@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { Analytics } from '@vercel/analytics/react';
 import {
   Building2,
   Wrench,
@@ -1672,6 +1673,7 @@ export default function App() {
           </div>
         ))}
       </div>
+      <Analytics />
     </div>
   );
 }

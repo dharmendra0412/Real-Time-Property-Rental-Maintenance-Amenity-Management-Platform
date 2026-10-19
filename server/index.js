@@ -62,7 +62,7 @@ const healthHandler = (req, res) => {
     uptime: process.uptime()
   });
 };
-app.get(['/api/health', '/health'], healthHandler);
+app.get(['/api/health', '/health', '/api', '/'], healthHandler);
 
 // Socket.io Real-Time Event Management
 io.on('connection', (socket) => {

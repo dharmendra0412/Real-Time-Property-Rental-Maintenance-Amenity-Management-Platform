@@ -4,11 +4,11 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/:match*",
+      "source": "/api/(.*)",
       "destination": "/api/index.js"
     },
     {
-      "source": "/uploads/:match*",
+      "source": "/uploads/(.*)",
       "destination": "/api/index.js"
     },
     {

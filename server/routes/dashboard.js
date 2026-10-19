@@ -3,8 +3,8 @@ const router = express.Router();
 const db = require('../db');
 const { authenticateToken } = require('../auth');
 
-// GET /api/dashboard/stats - Real-time operational metrics & KPIs
-router.get('/stats', authenticateToken, async (req, res) => {
+// GET /api/dashboard/stats - Real-time operational metrics & KPIs (Publicly visible overview)
+router.get('/stats', async (req, res) => {
   const startTime = process.hrtime();
 
   try {

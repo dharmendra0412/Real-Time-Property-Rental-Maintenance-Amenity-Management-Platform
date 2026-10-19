@@ -29,6 +29,7 @@ export const API = {
     }
 
     const config = { ...options, headers };
+    const response = await fetch(url, config);
     const text = await response.text();
     let data;
     try {

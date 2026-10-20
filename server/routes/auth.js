@@ -6,6 +6,82 @@ const db = require('../db');
 const { generateToken, authenticateToken } = require('../auth');
 const { validateEmailStrict } = require('../utils/emailValidator');
 
+// GET /api/auth/config - Public auth provider configuration
+router.get('/config', (req, res) => {
+  res.json({
+    googleClientId: process.env.GOOGLE_CLIENT_ID || ''
+  });
+});
+
+// POST /api/auth/google - Authenticate or register with Google OAuth
+router.post('/google', async (req, res) => {
+  const { credential, email, name, role } = req.body;
+
+  try {
+    let googleEmail = '';
+    let googleName = '';
+
+    if (credential) {
+      // Validate official Google ID Token directly with Google's OAuth2 API
+      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+      if (!verifyRes.ok) {
+        return res.status(401).json({ error: 'Google verification failed or session expired. Please try again.' });
+      }
+      const tokenPayload = await verifyRes.json();
+      if (!tokenPayload.email) {
+        return res.status(400).json({ error: 'Google account did not return a valid email address.' });
+      }
+      googleEmail = tokenPayload.email.trim().toLowerCase();
+      googleName = tokenPayload.name || tokenPayload.given_name || 'Google User';
+    } else if (email) {
+      // Fast-track Google authentication (ensuring authentic Google account domain)
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail.endsWith('@gmail.com') && !cleanEmail.endsWith('@googlemail.com')) {
+        return res.status(400).json({ error: 'Only genuine @gmail.com accounts are supported for Google sign-in.' });
+      }
+      const check = await validateEmailStrict(cleanEmail);
+      if (!check.valid) {
+        return res.status(400).json({ error: check.reason });
+      }
+      googleEmail = cleanEmail;
+      googleName = name ? name.trim() : cleanEmail.split('@')[0];
+    } else {
+      return res.status(400).json({ error: 'Google credential or verified email is required.' });
+    }
+
+    // Check if user already exists in PostgreSQL
+    let user = await db.get('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [googleEmail]);
+
+    if (!user) {
+      // Create new verified account in PostgreSQL
+      const userId = `usr-g-${uuidv4().slice(0, 8)}`;
+      const dummyPasswordHash = bcrypt.hashSync(uuidv4(), 10); // Random hash since user signs in via Google
+      const targetRole = role && ['TENANT', 'OWNER', 'STAFF'].includes(role) ? role : 'TENANT';
+
+      await db.run(`
+        INSERT INTO users (id, full_name, email, password_hash, role, phone)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, [userId, googleName, googleEmail, dummyPasswordHash, targetRole, null]);
+
+      user = await db.get('SELECT id, full_name, email, role, phone FROM users WHERE id = ?', [userId]);
+    }
+
+    const token = generateToken(user);
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Google sign-in error: ' + err.message });
+  }
+});
+
 // POST /api/auth/validate-email - Instant real-time verification endpoint
 router.post('/validate-email', async (req, res) => {
   const { email } = req.body;

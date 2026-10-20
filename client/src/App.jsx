@@ -325,6 +325,21 @@ export default function App() {
     }
   };
 
+  const handleGoogleLogin = async (payload) => {
+    try {
+      const res = await API.googleLogin(payload);
+      API.setToken(res.token);
+      setCurrentUser(res.user);
+      setAuthModalOpen(false);
+      addToast(`Signed in with Google as ${res.user.full_name}!`, 'success');
+      playChime(660, 880);
+      refreshAll();
+    } catch (err) {
+      addToast(err.message, 'error');
+      throw err;
+    }
+  };
+
   const handleLogout = () => {
     API.logout();
     setCurrentUser(null);
@@ -623,6 +638,7 @@ export default function App() {
         onClose={() => setAuthModalOpen(false)}
         onLogin={handleLogin}
         onRegister={handleRegister}
+        onGoogleLogin={handleGoogleLogin}
         onQuickDemo={handleQuickDemo}
       />
 

@@ -306,6 +306,7 @@ export default function App() {
       refreshAll();
     } catch (err) {
       addToast(err.message, 'error');
+      throw err;
     }
   };
 
@@ -320,6 +321,7 @@ export default function App() {
       refreshAll();
     } catch (err) {
       addToast(err.message, 'error');
+      throw err;
     }
   };
 

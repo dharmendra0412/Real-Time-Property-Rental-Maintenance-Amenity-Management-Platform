@@ -48,6 +48,7 @@ export const API = {
   // Auth
   login: (email, password) => API.request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   register: (payload) => API.request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
+  validateEmail: (email) => API.request('/auth/validate-email', { method: 'POST', body: JSON.stringify({ email }) }),
   getMe: () => API.request('/auth/me'),
   getUsers: (role) => API.request(role ? `/auth/users?role=${role}` : '/auth/users'),
 

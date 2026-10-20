@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   LogIn,
   UserPlus,
@@ -9,8 +9,13 @@ import {
   Lock,
   Mail,
   Phone,
-  Building2
+  Building2,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ShieldAlert
 } from 'lucide-react';
+import { API } from '../api';
 
 export default function AuthModal({
   isOpen,
@@ -22,6 +27,118 @@ export default function AuthModal({
 }) {
   const [mode, setMode] = useState(initialMode);
   const [selectedRole, setSelectedRole] = useState('TENANT');
+
+  const [emailInput, setEmailInput] = useState('');
+  const [emailValidation, setEmailValidation] = useState({
+    checking: false,
+    valid: null,
+    message: '',
+    domain: ''
+  });
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const debounceTimerRef = useRef(null);
+
+  useEffect(() => {
+    setMode(initialMode);
+    setFormError('');
+    setEmailValidation({ checking: false, valid: null, message: '', domain: '' });
+  }, [initialMode, isOpen]);
+
+  // Handle email changes with debounce validation in register mode
+  const handleEmailChange = (val) => {
+    setEmailInput(val);
+    setFormError('');
+
+    if (mode !== 'register') {
+      setEmailValidation({ checking: false, valid: null, message: '', domain: '' });
+      return;
+    }
+
+    const clean = val.trim();
+    if (!clean) {
+      setEmailValidation({ checking: false, valid: null, message: '', domain: '' });
+      return;
+    }
+
+    // Quick syntax test
+    if (!clean.includes('@') || !clean.includes('.')) {
+      setEmailValidation({
+        checking: false,
+        valid: null,
+        message: '',
+        domain: ''
+      });
+      return;
+    }
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    setEmailValidation({ checking: true, valid: null, message: 'Verifying email domain...', domain: '' });
+
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await API.validateEmail(clean);
+        setEmailValidation({
+          checking: false,
+          valid: true,
+          message: 'Verified authentic mail domain',
+          domain: res.domain || ''
+        });
+      } catch (err) {
+        setEmailValidation({
+          checking: false,
+          valid: false,
+          message: err.message || 'Invalid or disposable email address.',
+          domain: ''
+        });
+      }
+    }, 450);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    const form = e.target;
+    const emailVal = form.email.value.trim();
+    const passwordVal = form.password.value;
+
+    if (mode === 'register') {
+      // If client-side check has already detected a fake/disposable email, block immediately
+      if (emailValidation.valid === false) {
+        setFormError(emailValidation.message || 'Please enter a genuine, active email address.');
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        await onRegister({
+          full_name: form.full_name.value.trim(),
+          email: emailVal,
+          password: passwordVal,
+          role: selectedRole,
+          phone: form.phone ? form.phone.value.trim() : ''
+        });
+      } catch (err) {
+        setFormError(err.message || 'Registration failed. Please check your credentials.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      setIsSubmitting(true);
+      try {
+        await onLogin(emailVal, passwordVal);
+      } catch (err) {
+        setFormError(err.message || 'Invalid email or password.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -54,7 +171,10 @@ export default function AuthModal({
         {/* Mode Toggle Tabs */}
         <div className="flex p-1 rounded-xl bg-slate-900/80 border border-white/5">
           <button
-            onClick={() => setMode('login')}
+            onClick={() => {
+              setMode('login');
+              setFormError('');
+            }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition ${
               mode === 'login' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -62,7 +182,10 @@ export default function AuthModal({
             Sign In
           </button>
           <button
-            onClick={() => setMode('register')}
+            onClick={() => {
+              setMode('register');
+              setFormError('');
+            }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition ${
               mode === 'register' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -106,25 +229,18 @@ export default function AuthModal({
           </div>
         )}
 
+        {/* Inline Server / Validation Error Notice */}
+        {formError && (
+          <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 animate-shake">
+            <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-rose-300 leading-snug font-medium">
+              {formError}
+            </div>
+          </div>
+        )}
+
         {/* Form */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = e.target;
-            if (mode === 'login') {
-              onLogin(form.email.value.trim(), form.password.value);
-            } else {
-              onRegister({
-                full_name: form.full_name.value.trim(),
-                email: form.email.value.trim(),
-                password: form.password.value,
-                role: selectedRole,
-                phone: form.phone ? form.phone.value.trim() : ''
-              });
-            }
-          }}
-          className="space-y-3.5 text-xs"
-        >
+        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           {mode === 'register' && (
             <>
               <div>
@@ -179,17 +295,72 @@ export default function AuthModal({
           )}
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Email Address</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-slate-300 font-semibold">Email Address</label>
+              {mode === 'register' && (
+                <span className="text-[10px] text-slate-400">Genuine & Active Emails Only</span>
+              )}
+            </div>
             <div className="relative">
               <Mail className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 name="email"
                 type="email"
                 required
-                placeholder="name@example.com"
-                className="w-full pl-8 pr-3 py-2.5 rounded-xl glass-input text-xs"
+                value={emailInput}
+                onChange={(e) => handleEmailChange(e.target.value)}
+                placeholder="name@gmail.com"
+                className={`w-full pl-8 pr-8 py-2.5 rounded-xl glass-input text-xs transition ${
+                  emailValidation.valid === true
+                    ? 'border-emerald-500/50 focus:border-emerald-500'
+                    : emailValidation.valid === false
+                    ? 'border-rose-500/50 focus:border-rose-500'
+                    : ''
+                }`}
               />
+              {mode === 'register' && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {emailValidation.checking && (
+                    <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                  )}
+                  {emailValidation.valid === true && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  )}
+                  {emailValidation.valid === false && (
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* Register Mode Email Verification Feedback */}
+            {mode === 'register' && (
+              <div className="mt-1.5 space-y-1">
+                {emailValidation.checking && (
+                  <p className="flex items-center gap-1.5 text-[11px] text-blue-400">
+                    <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+                    <span>Verifying live mail server & DNS MX records...</span>
+                  </p>
+                )}
+                {emailValidation.valid === true && (
+                  <p className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+                    <CheckCircle2 className="w-3 h-3 shrink-0" />
+                    <span>Valid email domain verified ({emailValidation.domain || 'active'})</span>
+                  </p>
+                )}
+                {emailValidation.valid === false && (
+                  <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px] flex items-start gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                    <span>{emailValidation.message}</span>
+                  </div>
+                )}
+                {emailValidation.valid === null && !emailValidation.checking && (
+                  <p className="text-[10px] text-slate-500">
+                    Fake, dummy, or disposable email providers (e.g. TempMail, Mailinator) are blocked.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
@@ -208,9 +379,21 @@ export default function AuthModal({
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white shadow-lg shadow-blue-600/30 transition text-xs mt-2"
+            disabled={isSubmitting || (mode === 'register' && emailValidation.valid === false)}
+            className={`w-full py-2.5 rounded-xl font-bold text-white shadow-lg transition text-xs mt-2 flex items-center justify-center gap-2 ${
+              isSubmitting || (mode === 'register' && emailValidation.valid === false)
+                ? 'bg-slate-700 opacity-60 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'
+            }`}
           >
-            {mode === 'login' ? 'Sign In to Platform' : 'Create Skyline Account'}
+            {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            <span>
+              {isSubmitting
+                ? 'Processing...'
+                : mode === 'login'
+                ? 'Sign In to Platform'
+                : 'Create Skyline Account'}
+            </span>
           </button>
         </form>
       </div>

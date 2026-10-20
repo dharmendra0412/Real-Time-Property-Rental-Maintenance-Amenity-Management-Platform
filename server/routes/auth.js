@@ -4,6 +4,27 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
 const { generateToken, authenticateToken } = require('../auth');
+const { validateEmailStrict } = require('../utils/emailValidator');
+
+// POST /api/auth/validate-email - Instant real-time verification endpoint
+router.post('/validate-email', async (req, res) => {
+  const { email } = req.body;
+  const result = await validateEmailStrict(email);
+  if (!result.valid) {
+    return res.status(400).json({ valid: false, error: result.reason });
+  }
+
+  // Also check if already registered
+  try {
+    const existing = await db.get('SELECT id FROM users WHERE LOWER(email) = LOWER(?)', [email.trim()]);
+    if (existing) {
+      return res.status(409).json({ valid: false, error: 'An account with this email already exists.' });
+    }
+    res.json({ valid: true, domain: result.domain });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -46,6 +67,12 @@ router.post('/register', async (req, res) => {
 
   if (!full_name || !email || !password || !role) {
     return res.status(400).json({ error: 'Full name, email, password, and role are required.' });
+  }
+
+  // Strict email validation (anti-fake / anti-disposable / DNS MX check)
+  const emailCheck = await validateEmailStrict(email);
+  if (!emailCheck.valid) {
+    return res.status(400).json({ error: emailCheck.reason });
   }
 
   const validRoles = ['TENANT', 'OWNER', 'STAFF', 'ADMIN'];

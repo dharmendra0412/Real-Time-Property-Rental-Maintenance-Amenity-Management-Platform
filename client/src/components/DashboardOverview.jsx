@@ -188,13 +188,19 @@ export default function DashboardOverview({
           </div>
           <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-cyan-500 to-blue-400 h-1.5 rounded-full"
-              style={{ width: `${Math.min(Math.round(((kpis.system_response_ms || 20) / 2000) * 100), 100)}%` }}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                (kpis.system_response_ms || 0) <= 2000
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-400'
+                  : 'bg-gradient-to-r from-cyan-500 to-amber-400'
+              }`}
+              style={{ width: `${Math.min(Math.round(((kpis.system_response_ms || 20) / 4000) * 100), 100)}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className="text-emerald-400 font-bold">Target ≤ 2.0s</span>
-            <span>High-speed engine</span>
+            <span className={(kpis.system_response_ms || 0) <= 2000 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+              {(kpis.system_response_ms || 0) <= 2000 ? 'Target ≤ 2.0s' : 'Cross-Region Cloud DB'}
+            </span>
+            <span>Neon AWS US-East</span>
           </div>
         </div>
       </div>

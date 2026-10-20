@@ -57,35 +57,35 @@ export default function Navbar({
   const getRoleBadge = (role) => {
     switch (role) {
       case 'OWNER':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">OWNER</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0 whitespace-nowrap">OWNER</span>;
       case 'STAFF':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">FACILITIES</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shrink-0 whitespace-nowrap">FACILITIES</span>;
       case 'TENANT':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">TENANT</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shrink-0 whitespace-nowrap">TENANT</span>;
       default:
         return null;
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 lg:gap-3">
         {/* Left: Brand Logo & Title */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20">
+        <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => setActiveTab('dashboard')}>
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 shrink-0">
             <Building2 className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-base tracking-tight text-white font-['Outfit']">SKYLINE</span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">ENTERPRISE</span>
+          <div className="shrink-0">
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white font-['Outfit']">SKYLINE</span>
+              <span className="px-1.5 py-0.2 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">ENTERPRISE</span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide">Rental • Maintenance • Amenities</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide whitespace-nowrap">Rental • Maintenance • Amenities</p>
           </div>
         </div>
 
         {/* Center: Navigation Tabs */}
-        <nav className="hidden lg:flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/5">
+        <nav className="hidden lg:flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/5 shrink-0">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -93,7 +93,7 @@ export default function Navbar({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                   isActive
                     ? 'text-white bg-blue-600 shadow-md shadow-blue-600/30'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
@@ -109,37 +109,37 @@ export default function Navbar({
         {/* Search / Command Palette Trigger (Ctrl + K) */}
         <button
           onClick={onOpenCommandPalette}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-white/10 text-xs text-slate-400 hover:text-white transition shadow-sm"
+          className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-white/10 text-xs text-slate-400 hover:text-white transition shadow-sm shrink-0 whitespace-nowrap"
         >
-          <Search className="w-3.5 h-3.5 text-blue-400" />
-          <span className="text-[11px]">Command Palette...</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-400 border border-white/5">
+          <Search className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          <span className="hidden xl:inline text-[11px]">Command Palette</span>
+          <kbd className="px-1.5 py-0.2 rounded bg-slate-800 text-[9px] font-bold text-slate-400 border border-white/5">
             ⌘K
           </kbd>
         </button>
 
-        {/* Right Controls: Live Badge, Clock, Sound, Role Switcher, Auth */}
-        <div className="flex items-center gap-2">
-          {/* Live System Time */}
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/50 border border-white/5 text-[11px] font-mono text-slate-400">
+        {/* Right Controls: Live Badge, Sound, Demo Roles, Auth Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Live System Time on 2xl only */}
+          <div className="hidden 2xl:flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-900/50 border border-white/5 text-[11px] font-mono text-slate-400 shrink-0 whitespace-nowrap">
             <Clock className="w-3 h-3 text-slate-500" />
             <span>{timeStr}</span>
           </div>
 
           {/* Live WebSocket Status Indicator */}
-          <div className="hidden sm:flex items-center gap-1.5">
+          <div className="hidden sm:flex items-center shrink-0">
             {liveConnected ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse glow-dot-emerald" />
                 <span>LIVE SYNC</span>
               </div>
             ) : cloudOnline ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[11px] font-semibold">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-semibold whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 glow-dot-blue" />
                 <span>CLOUD ONLINE</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-semibold">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-semibold whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-rose-500" />
                 <span>OFFLINE</span>
               </div>
@@ -150,7 +150,7 @@ export default function Navbar({
           <button
             onClick={onExportReport}
             title="Export Operational Audit Snapshot (JSON)"
-            className="hidden sm:flex p-2 rounded-xl text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 transition"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 transition shrink-0"
           >
             <FileDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
@@ -159,20 +159,20 @@ export default function Navbar({
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             title={soundEnabled ? 'Audio alerts enabled' : 'Audio muted'}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 transition"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 transition shrink-0"
           >
             {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-blue-400" /> : <VolumeX className="w-3.5 h-3.5 text-slate-500" />}
           </button>
 
           {/* Quick Demo Persona Switcher */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowPersonaMenu(!showPersonaMenu)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/10 to-blue-500/10 hover:from-indigo-500/20 hover:to-blue-500/20 border border-indigo-500/25 text-indigo-300 text-xs font-semibold transition"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/10 to-blue-500/10 hover:from-indigo-500/20 hover:to-blue-500/20 border border-indigo-500/25 text-indigo-300 text-xs font-semibold transition shrink-0 whitespace-nowrap"
             >
-              <Radio className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden md:inline">Quick Demo Roles</span>
-              <ChevronDown className="w-3 h-3 text-indigo-400" />
+              <Radio className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span className="hidden sm:inline">Demo Roles</span>
+              <ChevronDown className="w-3 h-3 text-indigo-400 shrink-0" />
             </button>
 
             {showPersonaMenu && (
@@ -238,36 +238,36 @@ export default function Navbar({
 
           {/* User Profile or Login */}
           {currentUser ? (
-            <div className="flex items-center gap-2 p-1 pl-2.5 rounded-xl bg-slate-900/80 border border-white/5">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white uppercase">
+            <div className="flex items-center gap-1.5 p-1 pl-2 rounded-xl bg-slate-900/80 border border-white/5 shrink-0 whitespace-nowrap">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white uppercase shrink-0">
                   {currentUser.full_name ? currentUser.full_name[0] : 'U'}
                 </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-xs font-bold text-white leading-tight truncate max-w-[110px]">{currentUser.full_name}</p>
+                <div className="hidden md:block text-left shrink-0">
+                  <p className="text-xs font-bold text-white leading-tight truncate max-w-[90px] xl:max-w-[120px]">{currentUser.full_name}</p>
                 </div>
                 {getRoleBadge(currentUser.role)}
               </div>
               <button
                 onClick={onLogout}
                 title="Sign Out"
-                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition shrink-0"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => onOpenAuth('login')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition whitespace-nowrap"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>Sign In</span>
               </button>
               <button
                 onClick={() => onOpenAuth('register')}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/30 transition"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/30 transition whitespace-nowrap"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Register</span>

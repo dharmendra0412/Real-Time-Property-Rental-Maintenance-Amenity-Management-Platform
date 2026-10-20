@@ -8,13 +8,34 @@ router.get('/stats', async (req, res) => {
   const startTime = process.hrtime();
 
   try {
-    // 1. Maintenance Status Counts
-    const statusCounts = await db.all(`
-      SELECT status, COUNT(*) as count 
-      FROM maintenance_requests 
-      GROUP BY status
-    `);
+    const todayStr = new Date().toISOString().split('T')[0];
 
+    // Execute all independent queries in parallel using Promise.all
+    const [
+      statusCounts,
+      mttrRow,
+      csatRow,
+      categoryBreakdown,
+      priorityBreakdown,
+      totalBookingsRow,
+      activeTodayRow,
+      popularAmenities,
+      recentLogs,
+      recentBookings
+    ] = await Promise.all([
+      db.all(`SELECT status, COUNT(*) as count FROM maintenance_requests GROUP BY status`),
+      db.get(`SELECT AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600) as avg_resolution_hours, COUNT(*) as resolved_count FROM maintenance_requests WHERE resolved_at IS NOT NULL`),
+      db.get(`SELECT AVG(satisfaction_rating) as avg_rating, COUNT(*) as rated_count FROM maintenance_requests WHERE satisfaction_rating IS NOT NULL`),
+      db.all(`SELECT category, COUNT(*) as count FROM maintenance_requests GROUP BY category ORDER BY count DESC`),
+      db.all(`SELECT priority, COUNT(*) as count FROM maintenance_requests GROUP BY priority ORDER BY count DESC`),
+      db.get(`SELECT COUNT(*) as count FROM amenity_bookings`),
+      db.get(`SELECT COUNT(*) as count FROM amenity_bookings WHERE booking_date = ? AND status IN ('CONFIRMED', 'CHECKED_IN')`, [todayStr]),
+      db.all(`SELECT a.name, a.icon, COUNT(b.id) as booking_count FROM amenities a LEFT JOIN amenity_bookings b ON a.id = b.amenity_id GROUP BY a.id, a.name, a.icon ORDER BY booking_count DESC LIMIT 5`),
+      db.all(`SELECT l.id, 'MAINTENANCE' as event_type, l.action_note as message, l.created_at, u.full_name as actor_name, u.role as actor_role, r.title as subject_title, r.id as subject_id FROM maintenance_logs l JOIN users u ON l.changed_by_user_id = u.id JOIN maintenance_requests r ON l.request_id = r.id ORDER BY l.created_at DESC LIMIT 8`),
+      db.all(`SELECT b.id, 'AMENITY' as event_type, 'Booked ' || a.name || ' on ' || b.booking_date || ' (' || b.start_time || '-' || b.end_time || ')' as message, b.created_at, u.full_name as actor_name, u.role as actor_role, a.name as subject_title, b.id as subject_id FROM amenity_bookings b JOIN users u ON b.user_id = u.id JOIN amenities a ON b.amenity_id = a.id ORDER BY b.created_at DESC LIMIT 6`)
+    ]);
+
+    // 1. Maintenance Status Mapping
     const statusMap = { PENDING: 0, IN_PROGRESS: 0, COMPLETED: 0, CLOSED: 0 };
     let totalRequests = 0;
     statusCounts.forEach(s => {
@@ -23,14 +44,7 @@ router.get('/stats', async (req, res) => {
       totalRequests += cnt;
     });
 
-    // 2. MTTR (Mean Time to Resolution in Hours)
-    const mttrRow = await db.get(`
-      SELECT AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600) as avg_resolution_hours,
-             COUNT(*) as resolved_count
-      FROM maintenance_requests
-      WHERE resolved_at IS NOT NULL
-    `);
-
+    // 2. MTTR (Hours)
     const avgResolutionHours = mttrRow && mttrRow.avg_resolution_hours != null
       ? Math.round(Number(mttrRow.avg_resolution_hours) * 10) / 10 
       : null;
@@ -41,77 +55,14 @@ router.get('/stats', async (req, res) => {
       ? Math.round((completedOrClosed / totalRequests) * 100) 
       : 0;
 
-    // 4. Customer Satisfaction Rating (CSAT)
-    const csatRow = await db.get(`
-      SELECT AVG(satisfaction_rating) as avg_rating, COUNT(*) as rated_count
-      FROM maintenance_requests
-      WHERE satisfaction_rating IS NOT NULL
-    `);
-
+    // 4. CSAT Rating
     const csatRating = csatRow && csatRow.avg_rating != null
       ? Math.round(Number(csatRow.avg_rating) * 10) / 10 
       : null;
 
-    // 5. Category Breakdown
-    const categoryBreakdown = await db.all(`
-      SELECT category, COUNT(*) as count
-      FROM maintenance_requests
-      GROUP BY category
-      ORDER BY count DESC
-    `);
-
-    // 6. Priority Breakdown
-    const priorityBreakdown = await db.all(`
-      SELECT priority, COUNT(*) as count
-      FROM maintenance_requests
-      GROUP BY priority
-      ORDER BY count DESC
-    `);
-
-    // 7. Amenity Booking Stats
-    const totalBookingsRow = await db.get('SELECT COUNT(*) as count FROM amenity_bookings');
+    // 5. Amenity Booking Counts
     const totalBookings = totalBookingsRow ? parseInt(totalBookingsRow.count, 10) : 0;
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    const activeTodayRow = await db.get(`
-      SELECT COUNT(*) as count 
-      FROM amenity_bookings 
-      WHERE booking_date = ? AND status IN ('CONFIRMED', 'CHECKED_IN')
-    `, [todayStr]);
     const activeBookingsToday = activeTodayRow ? parseInt(activeTodayRow.count, 10) : 0;
-
-    const popularAmenities = await db.all(`
-      SELECT a.name, a.icon, COUNT(b.id) as booking_count
-      FROM amenities a
-      LEFT JOIN amenity_bookings b ON a.id = b.amenity_id
-      GROUP BY a.id, a.name, a.icon
-      ORDER BY booking_count DESC
-      LIMIT 5
-    `);
-
-    // 8. Live Activity Feed (Latest logs + bookings)
-    const recentLogs = await db.all(`
-      SELECT l.id, 'MAINTENANCE' as event_type, l.action_note as message, 
-             l.created_at, u.full_name as actor_name, u.role as actor_role,
-             r.title as subject_title, r.id as subject_id
-      FROM maintenance_logs l
-      JOIN users u ON l.changed_by_user_id = u.id
-      JOIN maintenance_requests r ON l.request_id = r.id
-      ORDER BY l.created_at DESC
-      LIMIT 8
-    `);
-
-    const recentBookings = await db.all(`
-      SELECT b.id, 'AMENITY' as event_type, 
-             'Booked ' || a.name || ' on ' || b.booking_date || ' (' || b.start_time || '-' || b.end_time || ')' as message,
-             b.created_at, u.full_name as actor_name, u.role as actor_role,
-             a.name as subject_title, b.id as subject_id
-      FROM amenity_bookings b
-      JOIN users u ON b.user_id = u.id
-      JOIN amenities a ON b.amenity_id = a.id
-      ORDER BY b.created_at DESC
-      LIMIT 6
-    `);
 
     const activityFeed = [...recentLogs, ...recentBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

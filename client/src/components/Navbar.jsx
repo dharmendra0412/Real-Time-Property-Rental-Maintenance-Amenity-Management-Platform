@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Building2,
   LayoutDashboard,
@@ -15,8 +15,7 @@ import {
   Activity,
   Radio,
   Search,
-  FileDown,
-  Clock
+  FileDown
 } from 'lucide-react';
 
 export default function Navbar({
@@ -34,18 +33,6 @@ export default function Navbar({
   onExportReport
 }) {
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
-  const [timeStr, setTimeStr] = useState('');
-
-  // Live ticking clock
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const navItems = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -69,78 +56,76 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 lg:gap-3">
-        {/* Left: Brand Logo & Title */}
-        <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => setActiveTab('dashboard')}>
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 shrink-0">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div className="shrink-0">
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white font-['Outfit']">SKYLINE</span>
-              <span className="px-1.5 py-0.2 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">ENTERPRISE</span>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 md:gap-3">
+        {/* Left: Brand Logo & Navigation */}
+        <div className="flex items-center gap-3 lg:gap-6 shrink-0">
+          <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => setActiveTab('dashboard')}>
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/25 ring-1 ring-white/20 shrink-0">
+              <Building2 className="w-5 h-5 text-white" />
             </div>
-            <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide whitespace-nowrap">Rental • Maintenance • Amenities</p>
+            <div className="shrink-0">
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="font-extrabold text-sm sm:text-base tracking-tight text-white font-['Outfit']">SKYLINE</span>
+                <span className="px-1.5 py-0.2 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">ENTERPRISE</span>
+              </div>
+              <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide whitespace-nowrap">Rental • Maintenance • Amenities</p>
+            </div>
           </div>
+
+          {/* Navigation Tabs */}
+          <nav className="hidden lg:flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/5 shrink-0">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-blue-600 shadow-md shadow-blue-600/30'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Center: Navigation Tabs */}
-        <nav className="hidden lg:flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/5 shrink-0">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                  isActive
-                    ? 'text-white bg-blue-600 shadow-md shadow-blue-600/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Search / Command Palette Trigger (Ctrl + K) */}
-        <button
-          onClick={onOpenCommandPalette}
-          className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-white/10 text-xs text-slate-400 hover:text-white transition shadow-sm shrink-0 whitespace-nowrap"
-        >
-          <Search className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-          <span className="hidden xl:inline text-[11px]">Command Palette</span>
-          <kbd className="px-1.5 py-0.2 rounded bg-slate-800 text-[9px] font-bold text-slate-400 border border-white/5">
-            ⌘K
-          </kbd>
-        </button>
-
-        {/* Right Controls: Live Badge, Sound, Demo Roles, Auth Profile */}
+        {/* Right Controls: Command Search, Live Badge, Sound, Demo Roles, User Profile */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Live System Time on 2xl only */}
-          <div className="hidden 2xl:flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-900/50 border border-white/5 text-[11px] font-mono text-slate-400 shrink-0 whitespace-nowrap">
-            <Clock className="w-3 h-3 text-slate-500" />
-            <span>{timeStr}</span>
-          </div>
+          {/* Compact Command Palette Trigger */}
+          <button
+            onClick={onOpenCommandPalette}
+            title="Command Palette (Ctrl + K)"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-white/10 text-xs text-slate-400 hover:text-white transition shadow-sm shrink-0 whitespace-nowrap"
+          >
+            <Search className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            <kbd className="hidden sm:inline px-1.5 py-0.2 rounded bg-slate-800 text-[9px] font-bold text-slate-400 border border-white/5">
+              ⌘K
+            </kbd>
+          </button>
 
-          {/* Live WebSocket Status Indicator */}
-          <div className="hidden sm:flex items-center shrink-0">
+          {/* Live Status Indicator */}
+          <div className="flex items-center shrink-0">
             {liveConnected ? (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse glow-dot-emerald" />
-                <span>LIVE SYNC</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse glow-dot-emerald shrink-0" />
+                <span className="hidden sm:inline">LIVE SYNC</span>
+                <span className="sm:hidden">LIVE</span>
               </div>
             ) : cloudOnline ? (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-semibold whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 glow-dot-blue" />
-                <span>CLOUD ONLINE</span>
+                <span className="w-2 h-2 rounded-full bg-cyan-400 glow-dot-blue shrink-0" />
+                <span className="hidden sm:inline">CLOUD ONLINE</span>
+                <span className="sm:hidden">CLOUD</span>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-semibold whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
                 <span>OFFLINE</span>
               </div>
             )}
@@ -171,7 +156,7 @@ export default function Navbar({
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/10 to-blue-500/10 hover:from-indigo-500/20 hover:to-blue-500/20 border border-indigo-500/25 text-indigo-300 text-xs font-semibold transition shrink-0 whitespace-nowrap"
             >
               <Radio className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span className="hidden sm:inline">Demo Roles</span>
+              <span>Demo Roles</span>
               <ChevronDown className="w-3 h-3 text-indigo-400 shrink-0" />
             </button>
 
@@ -238,14 +223,14 @@ export default function Navbar({
 
           {/* User Profile or Login */}
           {currentUser ? (
-            <div className="flex items-center gap-1.5 p-1 pl-2 rounded-xl bg-slate-900/80 border border-white/5 shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-1.5 p-1 pl-1.5 rounded-xl bg-slate-900/80 border border-white/5 shrink-0 whitespace-nowrap">
               <div className="flex items-center gap-1.5 shrink-0">
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] font-bold text-white uppercase shrink-0">
                   {currentUser.full_name ? currentUser.full_name[0] : 'U'}
                 </div>
-                <div className="hidden md:block text-left shrink-0">
-                  <p className="text-xs font-bold text-white leading-tight truncate max-w-[90px] xl:max-w-[120px]">{currentUser.full_name}</p>
-                </div>
+                <span className="hidden xl:inline text-xs font-bold text-white max-w-[100px] truncate shrink-0">
+                  {currentUser.full_name.split(' ')[0]}
+                </span>
                 {getRoleBadge(currentUser.role)}
               </div>
               <button

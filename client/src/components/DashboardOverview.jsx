@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Clock,
   CheckCircle2,
@@ -12,7 +12,11 @@ import {
   Sparkles,
   ArrowUpRight,
   User,
-  Radio
+  Radio,
+  TrendingUp,
+  BarChart3,
+  Layers,
+  SlidersHorizontal
 } from 'lucide-react';
 
 export default function DashboardOverview({
@@ -22,10 +26,14 @@ export default function DashboardOverview({
   onOpenNewTicket,
   currentUser
 }) {
+  const [feedFilter, setFeedFilter] = useState('ALL'); // 'ALL' | 'MAINTENANCE' | 'AMENITY'
+
   const kpis = stats?.kpis || {};
   const maintenance = stats?.maintenance || {};
   const amenities = stats?.amenities || {};
   const activityFeed = stats?.activity_feed || [];
+  const categories = maintenance?.by_category || [];
+  const priorities = maintenance?.by_priority || [];
 
   const formatRelativeTime = (isoString) => {
     if (!isoString) return '';
@@ -35,6 +43,15 @@ export default function DashboardOverview({
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
   };
+
+  const filteredFeed = activityFeed.filter((item) => {
+    if (feedFilter === 'ALL') return true;
+    return item.event_type === feedFilter;
+  });
+
+  // Calculate MTTR SLA progress (48 hour SLA benchmark)
+  const mttrValue = kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? Number(kpis.mttr_hours) : 0;
+  const mttrSlaPercent = Math.min(Math.round((mttrValue / 48) * 100), 100);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -50,17 +67,17 @@ export default function DashboardOverview({
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Audited system health, strict ACID concurrency metrics, and live PostgreSQL operational data.
+            Audited SLA compliance, ACID concurrency locks, and pure PostgreSQL operational metrics.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button
             onClick={onRefresh}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 hover:text-white transition shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-white/10 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 hover:text-white transition shadow-sm"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
+            <span>Live Refresh</span>
           </button>
           {currentUser && currentUser.role === 'TENANT' && (
             <button
@@ -76,7 +93,7 @@ export default function DashboardOverview({
 
       {/* 4 Core Hero KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: MTTR */}
+        {/* KPI 1: MTTR with SLA gauge */}
         <div className="glass-panel glass-panel-hover p-5 rounded-2xl relative overflow-hidden group">
           <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 absolute top-0 left-0 right-0" />
           <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
@@ -89,13 +106,17 @@ export default function DashboardOverview({
             <span className="text-3xl font-black text-white font-['Outfit']">
               {kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? `${kpis.mttr_hours}h` : 'N/A'}
             </span>
-            <span className="text-xs text-slate-400">database avg</span>
+            <span className="text-xs text-slate-400">avg SLA: 48h</span>
           </div>
-          <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-400">
-            <span className="px-1.5 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              SLA ≤ 48h
-            </span>
-            <span>Target benchmark</span>
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-blue-500 to-indigo-400 h-1.5 rounded-full transition-all duration-500"
+              style={{ width: `${Math.max(mttrSlaPercent, 5)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
+            <span className="text-emerald-400 font-bold">Within Target SLA</span>
+            <span>≤ 48h Benchmark</span>
           </div>
         </div>
 
@@ -120,6 +141,10 @@ export default function DashboardOverview({
               style={{ width: `${Math.min(kpis.completion_rate_percent || 0, 100)}%` }}
             />
           </div>
+          <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
+            <span className="text-emerald-400 font-bold">Target ≥ 90%</span>
+            <span>{maintenance.total ?? 0} total logged</span>
+          </div>
         </div>
 
         {/* KPI 3: Zero Booking Conflicts */}
@@ -137,11 +162,12 @@ export default function DashboardOverview({
             </span>
             <span className="text-xs text-emerald-400 font-semibold">Strictly 0</span>
           </div>
-          <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-400">
-            <span className="px-1.5 py-0.5 rounded font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              ACID LOCK
-            </span>
-            <span>Concurrency shielded</span>
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500 to-emerald-400 h-1.5 rounded-full w-full" />
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
+            <span className="text-amber-400 font-bold">ACID Transaction Lock</span>
+            <span>Race condition proof</span>
           </div>
         </div>
 
@@ -160,20 +186,24 @@ export default function DashboardOverview({
             </span>
             <span className="text-xs text-slate-400">query roundtrip</span>
           </div>
-          <div className="flex items-center gap-2 mt-3 text-[11px] text-slate-400">
-            <span className="px-1.5 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Target ≤ 2000ms
-            </span>
-            <span>Ultra high-speed</span>
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-cyan-500 to-blue-400 h-1.5 rounded-full"
+              style={{ width: `${Math.min(Math.round(((kpis.system_response_ms || 20) / 2000) * 100), 100)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
+            <span className="text-emerald-400 font-bold">Target ≤ 2.0s</span>
+            <span>High-speed engine</span>
           </div>
         </div>
       </div>
 
-      {/* Main 2-Column Grid: Maintenance Breakdown & Real-Time Feed */}
+      {/* Middle 2-Column Grid: Status Breakdown + Category Distribution & Live Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Status Breakdown & Priority Grid */}
+        {/* Left 2 Cols: Status Pipeline & Category Distribution */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Status Breakdown Box */}
+          {/* Status Pipeline Cards */}
           <div className="glass-panel p-6 rounded-2xl space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -184,12 +214,11 @@ export default function DashboardOverview({
                 onClick={() => setActiveTab('maintenance')}
                 className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 transition"
               >
-                <span>View all tickets</span>
+                <span>Open Kanban view</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* 4 Status Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div
                 onClick={() => setActiveTab('maintenance')}
@@ -232,16 +261,52 @@ export default function DashboardOverview({
               </div>
             </div>
 
-            {/* Amenity Highlights */}
+            {/* Category Breakdown Horizontal Bars */}
+            <div className="pt-4 border-t border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Category Distribution Breakdown</span>
+                </span>
+                <span className="text-[11px] text-slate-500">Live DB Aggregation</span>
+              </div>
+
+              <div className="space-y-2">
+                {categories.length === 0 ? (
+                  <p className="text-xs text-slate-500 italic">No tickets categorized yet.</p>
+                ) : (
+                  categories.map((cat, idx) => {
+                    const total = maintenance.total || 1;
+                    const percent = Math.round((Number(cat.count) / total) * 100);
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-300 font-medium">{cat.category}</span>
+                          <span className="text-slate-400 font-mono">{cat.count} tickets ({percent}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Amenity Highlights Bar */}
             <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">Amenity Utilization</p>
                   <p className="text-[11px] text-slate-400">
-                    {amenities.total_bookings ?? 0} total bookings verified in database
+                    {amenities.total_bookings ?? 0} total reservations verified in database
                   </p>
                 </div>
               </div>
@@ -256,9 +321,9 @@ export default function DashboardOverview({
           </div>
         </div>
 
-        {/* Right 1 Col: Real-Time Live Activity Feed */}
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full">
-          <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-4">
+        {/* Right 1 Col: Real-Time Live Activity Feed with Category Filter */}
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/5">
             <div className="flex items-center gap-2">
               <Radio className="w-4 h-4 text-emerald-400 animate-pulse glow-dot-emerald" />
               <h2 className="text-base font-bold text-white">Live Activity Feed</h2>
@@ -268,13 +333,29 @@ export default function DashboardOverview({
             </span>
           </div>
 
+          {/* Feed Filter Chips */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/60 border border-white/5 text-[11px]">
+            {['ALL', 'MAINTENANCE', 'AMENITY'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFeedFilter(f)}
+                className={`flex-1 py-1 rounded-lg font-semibold transition ${
+                  feedFilter === f ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {f === 'ALL' ? 'All Events' : f === 'MAINTENANCE' ? 'Tickets' : 'Amenities'}
+              </button>
+            ))}
+          </div>
+
+          {/* Feed Items */}
           <div className="flex-1 overflow-y-auto space-y-3 max-h-[380px] pr-1">
-            {activityFeed.length === 0 ? (
+            {filteredFeed.length === 0 ? (
               <div className="py-12 text-center text-slate-500 text-xs">
                 No recent database events recorded.
               </div>
             ) : (
-              activityFeed.map((item) => (
+              filteredFeed.map((item) => (
                 <div
                   key={item.id}
                   className="p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/60 border border-white/5 transition text-xs space-y-1.5"

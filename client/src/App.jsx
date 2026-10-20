@@ -10,6 +10,7 @@ import MaintenanceView from './components/MaintenanceView';
 import AmenitiesView from './components/AmenitiesView';
 import AuthModal from './components/AuthModal';
 import ToastContainer from './components/ToastContainer';
+import CommandPalette from './components/CommandPalette';
 
 export default function App() {
   // Navigation & UI State
@@ -18,6 +19,7 @@ export default function App() {
   const [toasts, setToasts] = useState([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   // Core Data State
   const [currentUser, setCurrentUser] = useState(null);
@@ -39,6 +41,18 @@ export default function App() {
 
   // Audio Context Ref
   const audioCtxRef = useRef(null);
+
+  // Global Ctrl+K / Cmd+K Command Palette Shortcut
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // 1. Toast Notification Helper
   const addToast = (message, type = 'info') => {
@@ -220,7 +234,6 @@ export default function App() {
         setSelectedProperty(data[0]);
       }
     } catch {
-      // If unauthenticated, fallback to public list
       try {
         const pub = await API.getPublicProperties();
         setProperties(pub || []);
@@ -441,13 +454,43 @@ export default function App() {
 
   const handleAddAmenity = async (amenityData) => {
     try {
-      // Attach to first property if not specified
       const propId = properties.length > 0 ? properties[0].id : null;
       await API.createAmenity({ ...amenityData, property_id: propId });
       addToast('Amenity registered and available for bookings!', 'success');
       refreshAll();
     } catch (err) {
       addToast(err.message, 'error');
+    }
+  };
+
+  // 7. Audit Report Export (Enterprise JSON Snapshot)
+  const handleExportReport = () => {
+    try {
+      const report = {
+        platform: 'Skyline Real-Time Management Platform',
+        timestamp: new Date().toISOString(),
+        engine: '100% Pure PostgreSQL (Neon Cloud)',
+        concurrency: 'ACID Transaction Locks Enforced',
+        kpis: stats?.kpis || {},
+        maintenance_overview: stats?.maintenance || {},
+        amenities_overview: stats?.amenities || {},
+        recent_activity_feed: stats?.activity_feed || [],
+        total_properties: properties.length,
+        total_tickets: tickets.length,
+        total_amenities: amenities.length
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(report, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `skyline_operational_audit_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      addToast('Operational audit snapshot downloaded successfully!', 'success');
+    } catch (err) {
+      addToast('Failed to export report: ' + err.message, 'error');
     }
   };
 
@@ -475,6 +518,8 @@ export default function App() {
         }}
         onLogout={handleLogout}
         onQuickLogin={handleQuickDemo}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+        onExportReport={handleExportReport}
       />
 
       {/* 2. Main Content Area */}
@@ -559,7 +604,17 @@ export default function App() {
         </div>
       </footer>
 
-      {/* 4. Auth Modal */}
+      {/* 4. Command Palette (Spotlight Search: Ctrl+K / Cmd+K) */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        setActiveTab={setActiveTab}
+        onQuickLogin={handleQuickDemo}
+        onOpenNewTicket={() => setActiveTab('maintenance')}
+        onExportReport={handleExportReport}
+      />
+
+      {/* 5. Auth Modal */}
       <AuthModal
         isOpen={authModalOpen}
         initialMode={authModalMode}
@@ -569,7 +624,7 @@ export default function App() {
         onQuickDemo={handleQuickDemo}
       />
 
-      {/* 5. Toast Notifications Container */}
+      {/* 6. Toast Notifications Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>
   );

@@ -97,3 +97,13 @@
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
 }
+
+/* Google Indeterminate Progress Bar */
+@keyframes google-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(400%); }
+}
+.animate-google-bar {
+  animation: google-bar 1.4s infinite ease-in-out;
+}

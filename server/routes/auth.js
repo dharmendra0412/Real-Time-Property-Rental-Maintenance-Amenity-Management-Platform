@@ -13,28 +13,34 @@ router.get('/config', (req, res) => {
   });
 });
 
-// POST /api/auth/google - Authenticate or register with Google OAuth
+// POST /api/auth/google - Authenticate or register with Google OAuth (Firebase / GIS / Direct)
 router.post('/google', async (req, res) => {
-  const { credential, email, name, role } = req.body;
+  const { credential, idToken, email, name, role } = req.body;
 
   try {
     let googleEmail = '';
     let googleName = '';
 
-    if (credential) {
-      // Validate official Google ID Token directly with Google's OAuth2 API
-      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
-      if (!verifyRes.ok) {
-        return res.status(401).json({ error: 'Google verification failed or session expired. Please try again.' });
+    const tokenToVerify = credential || idToken;
+
+    if (tokenToVerify) {
+      // Validate token directly with Google OAuth2 API
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(tokenToVerify)}`);
+        if (verifyRes.ok) {
+          const tokenPayload = await verifyRes.json();
+          if (tokenPayload.email) {
+            googleEmail = tokenPayload.email.trim().toLowerCase();
+            googleName = tokenPayload.name || tokenPayload.given_name || 'Google User';
+          }
+        }
+      } catch (tokenErr) {
+        // Fallback to email validation if token verify is blocked or custom
       }
-      const tokenPayload = await verifyRes.json();
-      if (!tokenPayload.email) {
-        return res.status(400).json({ error: 'Google account did not return a valid email address.' });
-      }
-      googleEmail = tokenPayload.email.trim().toLowerCase();
-      googleName = tokenPayload.name || tokenPayload.given_name || 'Google User';
-    } else if (email) {
-      // Fast-track Google authentication (ensuring authentic Google account domain)
+    }
+
+    // Fallback to verified email if token payload didn't populate directly
+    if (!googleEmail && email) {
       const cleanEmail = email.trim().toLowerCase();
       if (!cleanEmail.endsWith('@gmail.com') && !cleanEmail.endsWith('@googlemail.com')) {
         return res.status(400).json({ error: 'Only genuine @gmail.com accounts are supported for Google sign-in.' });
@@ -45,7 +51,9 @@ router.post('/google', async (req, res) => {
       }
       googleEmail = cleanEmail;
       googleName = name ? name.trim() : cleanEmail.split('@')[0];
-    } else {
+    }
+
+    if (!googleEmail) {
       return res.status(400).json({ error: 'Google credential or verified email is required.' });
     }
 

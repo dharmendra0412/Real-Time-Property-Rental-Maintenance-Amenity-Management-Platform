@@ -1,6 +1,17 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
+// User's configured Firebase project settings
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYtrjVXeRRaWD7lFVEyn1IqSJbuSI370g",
+  authDomain: "sjyline-enterprise.firebaseapp.com",
+  projectId: "sjyline-enterprise",
+  storageBucket: "sjyline-enterprise.firebasestorage.app",
+  messagingSenderId: "44847642712",
+  appId: "1:44847642712:web:495a4ec7db4aa6bff8322d",
+  measurementId: "G-32GHS0F46J"
+};
+
 export const getFirebaseConfig = () => {
   let localSaved = {};
   try {
@@ -10,12 +21,12 @@ export const getFirebaseConfig = () => {
   }
 
   return {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || localSaved.apiKey || '',
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || localSaved.authDomain || '',
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || localSaved.projectId || '',
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || localSaved.storageBucket || '',
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || localSaved.messagingSenderId || '',
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || localSaved.appId || ''
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || localSaved.apiKey || DEFAULT_FIREBASE_CONFIG.apiKey,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || localSaved.authDomain || DEFAULT_FIREBASE_CONFIG.authDomain,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || localSaved.projectId || DEFAULT_FIREBASE_CONFIG.projectId,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || localSaved.storageBucket || DEFAULT_FIREBASE_CONFIG.storageBucket,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || localSaved.messagingSenderId || DEFAULT_FIREBASE_CONFIG.messagingSenderId,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || localSaved.appId || DEFAULT_FIREBASE_CONFIG.appId
   };
 };
 
@@ -52,7 +63,7 @@ export const initFirebase = () => {
   }
 };
 
-// Initialize on module load if config present
+// Initialize on module load
 initFirebase();
 
 /**

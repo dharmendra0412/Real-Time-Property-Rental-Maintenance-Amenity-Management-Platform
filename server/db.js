@@ -6,12 +6,22 @@ const databaseUrl = process.env.DATABASE_URL;
 let pool = null;
 if (databaseUrl) {
   console.log('[Database] Connecting to PostgreSQL Database via pg Pool...');
+  const hostMatch = databaseUrl.match(/@([^:/]+)/);
+  const dbHost = hostMatch ? hostMatch[1] : undefined;
+
   pool = new Pool({
     connectionString: databaseUrl,
-    ssl: databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false }
+    ssl: databaseUrl.includes('localhost') ? false : {
+      rejectUnauthorized: false,
+      servername: dbHost
+    },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 15000,
+    keepAlive: true
   });
   pool.on('error', (err) => {
-    console.error('[PostgreSQL Pool Error]:', err.message);
+    console.error('[PostgreSQL Pool Notice]:', err.message);
   });
 } else {
   console.error('[Database Fatal]: DATABASE_URL is missing in environment variables!');
@@ -23,34 +33,62 @@ function formatPgQuery(sql) {
   return sql.replace(/\?/g, () => `$${++idx}`);
 }
 
+// Automatic retry for serverless wake-up (e.g. Neon compute sleep)
+async function executeWithRetry(fn, maxRetries = 2) {
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isTransient = err.code === 'ECONNRESET' || 
+                          err.message?.includes('Connection terminated') ||
+                          err.message?.includes('closed unexpectedly');
+      if (isTransient && i < maxRetries) {
+        await new Promise(r => setTimeout(r, 500 * (i + 1)));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 const db = {
   pool,
 
   async query(sql, params = []) {
     const pgSql = formatPgQuery(sql);
-    const res = await pool.query(pgSql, params);
-    return res.rows;
+    return await executeWithRetry(async () => {
+      const res = await pool.query(pgSql, params);
+      return res.rows;
+    });
   },
 
   async all(sql, params = []) {
     const pgSql = formatPgQuery(sql);
-    const res = await pool.query(pgSql, params);
-    return res.rows;
+    return await executeWithRetry(async () => {
+      const res = await pool.query(pgSql, params);
+      return res.rows;
+    });
   },
 
   async get(sql, params = []) {
     const pgSql = formatPgQuery(sql);
-    const res = await pool.query(pgSql, params);
-    return res.rows[0] || null;
+    return await executeWithRetry(async () => {
+      const res = await pool.query(pgSql, params);
+      return res.rows[0] || null;
+    });
   },
 
   async run(sql, params = []) {
     const pgSql = formatPgQuery(sql);
-    return await pool.query(pgSql, params);
+    return await executeWithRetry(async () => {
+      return await pool.query(pgSql, params);
+    });
   },
 
   async exec(sql) {
-    return await pool.query(sql);
+    return await executeWithRetry(async () => {
+      return await pool.query(sql);
+    });
   },
 
   async transaction(fn) {

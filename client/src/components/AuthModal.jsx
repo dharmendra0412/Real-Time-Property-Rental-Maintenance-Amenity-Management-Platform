@@ -263,8 +263,8 @@ export default function AuthModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-md glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 border border-white/10 relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="w-full max-w-md glass-panel rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 border border-white/10 relative overflow-hidden my-auto max-h-[92vh] overflow-y-auto">
         {/* Ambient Top Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 blur-sm" />
 

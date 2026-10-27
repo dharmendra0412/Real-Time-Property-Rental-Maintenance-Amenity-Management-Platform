@@ -97,3 +97,20 @@
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
 }
+
+/* Mobile & Touch Optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-area-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -56,10 +56,10 @@ export default function DashboardOverview({
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Banner & Refresh */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-white/5">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-white font-['Outfit']">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white font-['Outfit']">
               Real-Time Operational Intelligence
             </h1>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -71,10 +71,10 @@ export default function DashboardOverview({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={onRefresh}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-white/10 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 hover:text-white transition shadow-sm"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl border border-white/10 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 hover:text-white transition shadow-sm active:scale-95"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Live Refresh</span>
@@ -82,7 +82,7 @@ export default function DashboardOverview({
           {currentUser && currentUser.role === 'TENANT' && (
             <button
               onClick={onOpenNewTicket}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition active:scale-95"
             >
               <Wrench className="w-3.5 h-3.5" />
               <span>Report Issue</span>
@@ -92,101 +92,101 @@ export default function DashboardOverview({
       </div>
 
       {/* 4 Core Hero KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* KPI 1: MTTR with SLA gauge */}
-        <div className="glass-panel glass-panel-hover p-5 rounded-2xl relative overflow-hidden group">
+        <div className="glass-panel glass-panel-hover p-3.5 sm:p-5 rounded-2xl relative overflow-hidden group">
           <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 absolute top-0 left-0 right-0" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>Resolution Time (MTTR)</span>
-            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
-              <Clock className="w-4 h-4" />
+          <div className="flex items-center justify-between text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2">
+            <span className="truncate">MTTR Resolution</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-blue-500/10 text-blue-400 shrink-0">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white font-['Outfit']">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
               {kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? `${kpis.mttr_hours}h` : 'N/A'}
             </span>
-            <span className="text-xs text-slate-400">avg SLA: 48h</span>
+            <span className="text-[10px] sm:text-xs text-slate-400">SLA: 48h</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 sm:mt-3 overflow-hidden">
             <div
               className="bg-gradient-to-r from-blue-500 to-indigo-400 h-1.5 rounded-full transition-all duration-500"
               style={{ width: `${Math.max(mttrSlaPercent, 5)}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className="text-emerald-400 font-bold">Within Target SLA</span>
-            <span>≤ 48h Benchmark</span>
+            <span className="text-emerald-400 font-bold truncate">Within SLA</span>
+            <span className="hidden sm:inline">≤ 48h Bench</span>
           </div>
         </div>
 
         {/* KPI 2: Completion Rate */}
-        <div className="glass-panel glass-panel-hover p-5 rounded-2xl relative overflow-hidden group">
+        <div className="glass-panel glass-panel-hover p-3.5 sm:p-5 rounded-2xl relative overflow-hidden group">
           <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0 right-0" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>Completion Rate</span>
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-              <CheckCircle2 className="w-4 h-4" />
+          <div className="flex items-center justify-between text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2">
+            <span className="truncate">Completion</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white font-['Outfit']">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
               {kpis.completion_rate_percent ?? 0}%
             </span>
-            <span className="text-xs text-slate-400">resolved tickets</span>
+            <span className="text-[10px] sm:text-xs text-slate-400">resolved</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 sm:mt-3 overflow-hidden">
             <div
               className="bg-gradient-to-r from-emerald-500 to-teal-400 h-1.5 rounded-full transition-all duration-500"
               style={{ width: `${Math.min(kpis.completion_rate_percent || 0, 100)}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className="text-emerald-400 font-bold">Target ≥ 90%</span>
-            <span>{maintenance.total ?? 0} total logged</span>
+            <span className="text-emerald-400 font-bold">≥ 90% Target</span>
+            <span className="hidden sm:inline">{maintenance.total ?? 0} total</span>
           </div>
         </div>
 
         {/* KPI 3: Zero Booking Conflicts */}
-        <div className="glass-panel glass-panel-hover p-5 rounded-2xl relative overflow-hidden group">
+        <div className="glass-panel glass-panel-hover p-3.5 sm:p-5 rounded-2xl relative overflow-hidden group">
           <div className="h-1 bg-gradient-to-r from-amber-500 to-orange-500 absolute top-0 left-0 right-0" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>Booking Conflicts</span>
-            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
-              <ShieldCheck className="w-4 h-4" />
+          <div className="flex items-center justify-between text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2">
+            <span className="truncate">Conflicts</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-amber-500/10 text-amber-400 shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white font-['Outfit']">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
               {kpis.conflicts_prevented_count ?? 0}
             </span>
-            <span className="text-xs text-emerald-400 font-semibold">Strictly 0</span>
+            <span className="text-[10px] sm:text-xs text-emerald-400 font-semibold">Strictly 0</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 sm:mt-3 overflow-hidden">
             <div className="bg-gradient-to-r from-amber-500 to-emerald-400 h-1.5 rounded-full w-full" />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className="text-amber-400 font-bold">ACID Transaction Lock</span>
-            <span>Race condition proof</span>
+            <span className="text-amber-400 font-bold truncate">ACID Lock</span>
+            <span className="hidden sm:inline">Zero Race</span>
           </div>
         </div>
 
         {/* KPI 4: Response Latency */}
-        <div className="glass-panel glass-panel-hover p-5 rounded-2xl relative overflow-hidden group">
+        <div className="glass-panel glass-panel-hover p-3.5 sm:p-5 rounded-2xl relative overflow-hidden group">
           <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-500 absolute top-0 left-0 right-0" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>API Response Latency</span>
-            <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400">
-              <Zap className="w-4 h-4" />
+          <div className="flex items-center justify-between text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5 sm:mb-2">
+            <span className="truncate">Latency</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
+              <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white font-['Outfit']">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
               {kpis.system_response_ms ? Math.round(kpis.system_response_ms) : 0}ms
             </span>
-            <span className="text-xs text-slate-400">query roundtrip</span>
+            <span className="text-[10px] sm:text-xs text-slate-400">roundtrip</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 sm:mt-3 overflow-hidden">
             <div
               className={`h-1.5 rounded-full transition-all duration-500 ${
                 (kpis.system_response_ms || 0) <= 2000
@@ -197,10 +197,10 @@ export default function DashboardOverview({
             />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className={(kpis.system_response_ms || 0) <= 2000 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-              {(kpis.system_response_ms || 0) <= 2000 ? 'Target ≤ 2.0s' : 'Cross-Region Cloud DB'}
+            <span className={(kpis.system_response_ms || 0) <= 2000 ? 'text-emerald-400 font-bold truncate' : 'text-amber-400 font-bold truncate'}>
+              {(kpis.system_response_ms || 0) <= 2000 ? 'Target ≤ 2.0s' : 'Cloud DB'}
             </span>
-            <span>Neon AWS US-East</span>
+            <span className="hidden sm:inline">Neon AWS</span>
           </div>
         </div>
       </div>

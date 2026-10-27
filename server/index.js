@@ -100,7 +100,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 if (process.env.VERCEL !== '1') {
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`================================================================`);
     console.log(`🚀 Real-Time Property Platform Server running on port ${PORT}`);
     console.log(`📡 Local Web Application: http://localhost:${PORT}`);

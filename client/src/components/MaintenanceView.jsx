@@ -344,11 +344,11 @@ export default function MaintenanceView({
         </div>
 
         {/* Priority & Category & Search */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="p-1.5 px-3 rounded-xl glass-input text-xs"
+            className="flex-1 sm:flex-initial p-2 sm:p-1.5 px-3 rounded-xl glass-input text-xs"
           >
             <option value="ALL">All Priorities</option>
             <option value="EMERGENCY">Emergency</option>
@@ -360,7 +360,7 @@ export default function MaintenanceView({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="p-1.5 px-3 rounded-xl glass-input text-xs"
+            className="flex-1 sm:flex-initial p-2 sm:p-1.5 px-3 rounded-xl glass-input text-xs"
           >
             <option value="ALL">All Categories</option>
             <option value="PLUMBING">Plumbing</option>
@@ -371,14 +371,14 @@ export default function MaintenanceView({
             <option value="GENERAL">General</option>
           </select>
 
-          <div className="relative flex-1 md:w-48">
+          <div className="relative w-full sm:w-48">
             <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl glass-input text-xs"
+              className="w-full pl-8 pr-3 py-2 sm:py-1.5 rounded-xl glass-input text-xs"
             />
           </div>
         </div>
@@ -386,68 +386,74 @@ export default function MaintenanceView({
 
       {/* Main View: Kanban Board vs Grid */}
       {viewMode === 'kanban' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-          {/* Column 1: PENDING */}
-          <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[500px]">
-            <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <span>Pending</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">
-                {filteredTickets.filter((t) => t.status === 'PENDING').length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {filteredTickets.filter((t) => t.status === 'PENDING').map(renderTicketCard)}
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-[11px] text-slate-500 lg:hidden px-1">
+            <span>Swipe horizontally to view all columns</span>
+            <span>👉 4 Columns</span>
           </div>
+          <div className="flex lg:grid lg:grid-cols-4 overflow-x-auto snap-x snap-mandatory lg:overflow-visible gap-4 pb-4 no-scrollbar items-start">
+            {/* Column 1: PENDING */}
+            <div className="w-[84vw] max-w-[340px] shrink-0 lg:w-auto lg:max-w-none lg:shrink snap-center p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[480px]">
+              <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>Pending</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">
+                  {filteredTickets.filter((t) => t.status === 'PENDING').length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {filteredTickets.filter((t) => t.status === 'PENDING').map(renderTicketCard)}
+              </div>
+            </div>
 
-          {/* Column 2: IN_PROGRESS */}
-          <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[500px]">
-            <div className="flex items-center justify-between pb-2 border-b border-blue-500/20">
-              <span className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-blue-400" />
-                <span>In Progress</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">
-                {filteredTickets.filter((t) => t.status === 'IN_PROGRESS').length}
-              </span>
+            {/* Column 2: IN_PROGRESS */}
+            <div className="w-[84vw] max-w-[340px] shrink-0 lg:w-auto lg:max-w-none lg:shrink snap-center p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[480px]">
+              <div className="flex items-center justify-between pb-2 border-b border-blue-500/20">
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-400" />
+                  <span>In Progress</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">
+                  {filteredTickets.filter((t) => t.status === 'IN_PROGRESS').length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {filteredTickets.filter((t) => t.status === 'IN_PROGRESS').map(renderTicketCard)}
+              </div>
             </div>
-            <div className="space-y-3">
-              {filteredTickets.filter((t) => t.status === 'IN_PROGRESS').map(renderTicketCard)}
-            </div>
-          </div>
 
-          {/* Column 3: COMPLETED */}
-          <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[500px]">
-            <div className="flex items-center justify-between pb-2 border-b border-teal-500/20">
-              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-teal-400" />
-                <span>Completed</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/10 text-teal-400">
-                {filteredTickets.filter((t) => t.status === 'COMPLETED').length}
-              </span>
+            {/* Column 3: COMPLETED */}
+            <div className="w-[84vw] max-w-[340px] shrink-0 lg:w-auto lg:max-w-none lg:shrink snap-center p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[480px]">
+              <div className="flex items-center justify-between pb-2 border-b border-teal-500/20">
+                <span className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-teal-400" />
+                  <span>Completed</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/10 text-teal-400">
+                  {filteredTickets.filter((t) => t.status === 'COMPLETED').length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {filteredTickets.filter((t) => t.status === 'COMPLETED').map(renderTicketCard)}
+              </div>
             </div>
-            <div className="space-y-3">
-              {filteredTickets.filter((t) => t.status === 'COMPLETED').map(renderTicketCard)}
-            </div>
-          </div>
 
-          {/* Column 4: CLOSED */}
-          <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[500px]">
-            <div className="flex items-center justify-between pb-2 border-b border-emerald-500/20">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Closed</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">
-                {filteredTickets.filter((t) => t.status === 'CLOSED').length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {filteredTickets.filter((t) => t.status === 'CLOSED').map(renderTicketCard)}
+            {/* Column 4: CLOSED */}
+            <div className="w-[84vw] max-w-[340px] shrink-0 lg:w-auto lg:max-w-none lg:shrink snap-center p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 space-y-3 min-h-[480px]">
+              <div className="flex items-center justify-between pb-2 border-b border-emerald-500/20">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Closed</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">
+                  {filteredTickets.filter((t) => t.status === 'CLOSED').length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {filteredTickets.filter((t) => t.status === 'CLOSED').map(renderTicketCard)}
+              </div>
             </div>
           </div>
         </div>

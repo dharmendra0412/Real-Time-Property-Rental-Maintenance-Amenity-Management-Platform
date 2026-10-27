@@ -540,7 +540,7 @@ export default function App() {
       />
 
       {/* 2. Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 pb-24 lg:pb-8 relative z-10">
         {activeTab === 'dashboard' && (
           <DashboardOverview
             stats={stats}
@@ -605,7 +605,7 @@ export default function App() {
       </main>
 
       {/* 3. Footer */}
-      <footer className="border-t border-white/5 py-6 bg-slate-950/80 backdrop-blur-md relative z-10 mt-auto">
+      <footer className="border-t border-white/5 py-6 bg-slate-950/80 backdrop-blur-md relative z-10 mt-auto mb-16 lg:mb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <p>© 2026 Skyline Enterprise Platform. Certified 100% Pure PostgreSQL Engine.</p>
           <div className="flex items-center gap-4">

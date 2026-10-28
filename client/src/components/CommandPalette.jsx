@@ -75,35 +75,6 @@ export default function CommandPalette({
       ]
     },
     {
-      category: 'Quick Role Switching',
-      items: [
-        {
-          id: 'role-owner',
-          label: 'Switch to Property Owner (Dharmesh Sharma)',
-          desc: 'Full administrator privileges and property creation',
-          icon: Shield,
-          color: 'text-amber-400',
-          action: () => { onQuickLogin('dharmesh.owner@realestate.com', 'securepassword123'); onClose(); }
-        },
-        {
-          id: 'role-tenant',
-          label: 'Switch to Resident Tenant (Rahul Verma)',
-          desc: 'Lease holder in Tower A - 402 with booking access',
-          icon: User,
-          color: 'text-emerald-400',
-          action: () => { onQuickLogin('rahul.verma@gmail.com', 'securepassword123'); onClose(); }
-        },
-        {
-          id: 'role-staff',
-          label: 'Switch to Facilities Staff (Suresh Kumar)',
-          desc: 'Technician portal to complete and resolve tickets',
-          icon: Wrench,
-          color: 'text-cyan-400',
-          action: () => { onQuickLogin('suresh.tech@services.com', 'securepassword123'); onClose(); }
-        }
-      ]
-    },
-    {
       category: 'Fast Actions',
       items: [
         {

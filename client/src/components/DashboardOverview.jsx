@@ -61,34 +61,32 @@ export default function DashboardOverview({
   const mttrValue = kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? Number(kpis.mttr_hours) : 0;
   const mttrSlaPercent = Math.min(Math.round((mttrValue / 48) * 100), 100);
 
-  // 7-Day Dynamic Trend Data derived from maintenance stats
-  const totalMaint = maintenance.total || 12;
-  const compMaint = maintenance.completed || 8;
-  const inProgMaint = maintenance.in_progress || 3;
-  const pendMaint = maintenance.pending || 1;
-
-  const trendData = [
-    { day: 'Mon', tickets: Math.max(1, Math.round(pendMaint * 0.8)), resolved: Math.max(1, Math.round(compMaint * 0.2)), latency: 85 },
-    { day: 'Tue', tickets: Math.max(2, Math.round(inProgMaint * 0.9)), resolved: Math.max(2, Math.round(compMaint * 0.4)), latency: 68 },
-    { day: 'Wed', tickets: Math.max(3, Math.round(totalMaint * 0.4)), resolved: Math.max(2, Math.round(compMaint * 0.5)), latency: 62 },
-    { day: 'Thu', tickets: Math.max(2, Math.round(totalMaint * 0.3)), resolved: Math.max(3, Math.round(compMaint * 0.7)), latency: 74 },
-    { day: 'Fri', tickets: Math.max(4, Math.round(totalMaint * 0.6)), resolved: Math.max(4, Math.round(compMaint * 0.8)), latency: 55 },
-    { day: 'Sat', tickets: Math.max(2, Math.round(totalMaint * 0.2)), resolved: Math.max(3, Math.round(compMaint * 0.9)), latency: 59 },
-    { day: 'Sun', tickets: Math.max(1, Math.round(totalMaint * 0.1)), resolved: compMaint, latency: 48 }
-  ];
+  // 100% Real PostgreSQL 7-Day Trend Data
+  const trendData = stats?.daily_trends && stats.daily_trends.length > 0
+    ? stats.daily_trends
+    : [
+        { day: 'Mon', tickets: 0, resolved: 0 },
+        { day: 'Tue', tickets: 0, resolved: 0 },
+        { day: 'Wed', tickets: 0, resolved: 0 },
+        { day: 'Thu', tickets: 0, resolved: 0 },
+        { day: 'Fri', tickets: 0, resolved: 0 },
+        { day: 'Sat', tickets: 0, resolved: 0 },
+        { day: 'Sun', tickets: 0, resolved: 0 }
+      ];
 
   // SVG Area Chart Dimensions
   const chartWidth = 540;
   const chartHeight = 160;
-  const maxVal = Math.max(...trendData.map(d => Math.max(d.tickets, d.resolved)), 6);
-  const stepX = chartWidth / (trendData.length - 1);
+  const maxVal = Math.max(...trendData.map(d => Math.max(d.tickets, d.resolved)), 4);
+  const stepX = chartWidth / (trendData.length - 1 || 1);
 
   const getPoints = (key) =>
     trendData.map((d, i) => ({
       x: i * stepX,
       y: chartHeight - 20 - (d[key] / maxVal) * (chartHeight - 40),
       val: d[key],
-      day: d.day
+      day: d.day,
+      date_str: d.date_str
     }));
 
   const ticketPoints = getPoints('tickets');
@@ -118,21 +116,13 @@ export default function DashboardOverview({
     { name: 'GENERAL', color: '#10b981', hex: 'from-emerald-400 to-teal-500' }
   ];
 
-  const totalCatCount = categories.reduce((sum, c) => sum + Number(c.count), 0) || 1;
+  const totalCatCount = categories.reduce((sum, c) => sum + Number(c.count), 0);
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   let accumulatedPercent = 0;
 
-  // Hourly Amenity Traffic Heatmap Data
-  const hourlySlots = [
-    { label: '08:00', bookings: 2, cap: 4, name: 'Morning Fitness' },
-    { label: '10:00', bookings: 4, cap: 4, name: 'Swimming Pool' },
-    { label: '12:00', bookings: 1, cap: 4, name: 'Clubhouse' },
-    { label: '14:00', bookings: 3, cap: 4, name: 'Tennis Court' },
-    { label: '16:00', bookings: 4, cap: 4, name: 'Gym & Cardio' },
-    { label: '18:00', bookings: 4, cap: 4, name: 'Evening Yoga' },
-    { label: '20:00', bookings: 2, cap: 4, name: 'Rooftop Lounge' }
-  ];
+  // 100% Real Hourly Amenity Bookings from PostgreSQL
+  const hourlyAmenities = stats?.hourly_amenities || [];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -143,9 +133,6 @@ export default function DashboardOverview({
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white font-['Outfit']">
               Real-Time Operational Intelligence
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 glow-dot-emerald">
-              ZERO SIMULATION
-            </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
             Audited SLA compliance, ACID concurrency locks, and pure PostgreSQL operational metrics.
@@ -185,7 +172,7 @@ export default function DashboardOverview({
           </div>
           <div className="flex items-baseline gap-1.5 sm:gap-2">
             <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
-              {kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? `${kpis.mttr_hours}h` : 'N/A'}
+              {kpis.mttr_hours !== null && kpis.mttr_hours !== undefined ? `${kpis.mttr_hours}h` : '0h'}
             </span>
             <span className="text-[10px] sm:text-xs text-slate-400">SLA: 48h</span>
           </div>
@@ -247,7 +234,7 @@ export default function DashboardOverview({
             <div className="bg-gradient-to-r from-amber-500 to-emerald-400 h-1.5 rounded-full w-full" />
           </div>
           <div className="flex items-center justify-between mt-2 text-[10px] text-slate-400">
-            <span className="text-amber-400 font-bold truncate">ACID Lock</span>
+            <span className="text-amber-400 font-bold truncate">ACID Transaction Lock</span>
             <span className="hidden sm:inline">Zero Race</span>
           </div>
         </div>
@@ -265,7 +252,7 @@ export default function DashboardOverview({
             <span className="text-2xl sm:text-3xl font-black text-white font-['Outfit']">
               {kpis.system_response_ms ? Math.round(kpis.system_response_ms) : 0}ms
             </span>
-            <span className="text-[10px] sm:text-xs text-slate-400">roundtrip</span>
+            <span className="text-[10px] sm:text-xs text-slate-400">query roundtrip</span>
           </div>
           <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 sm:mt-3 overflow-hidden">
             <div
@@ -286,7 +273,7 @@ export default function DashboardOverview({
         </div>
       </div>
 
-      {/* NEW: Interactive Analytics Section (SVG Trend Velocity & Peak Traffic) */}
+      {/* Analytics Section: Genuine 7-Day Velocity & Real Hourly Bookings */}
       <div className="glass-panel p-5 sm:p-6 rounded-2xl space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
           <div className="flex items-center gap-2.5">
@@ -294,8 +281,8 @@ export default function DashboardOverview({
               <Activity className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-white">Operational Velocity & 7-Day Trend Analysis</h2>
-              <p className="text-[11px] text-slate-400">Interactive telemetry from production maintenance lifecycle</p>
+              <h2 className="text-sm sm:text-base font-bold text-white">7-Day Operational Activity & Booking Velocity</h2>
+              <p className="text-[11px] text-slate-400">Computed live from PostgreSQL production records</p>
             </div>
           </div>
 
@@ -307,7 +294,7 @@ export default function DashboardOverview({
               }`}
             >
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>Ticket Velocity</span>
+              <span>Ticket Activity</span>
             </button>
             <button
               onClick={() => setChartView('amenities')}
@@ -316,26 +303,26 @@ export default function DashboardOverview({
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>Amenity Heatmap</span>
+              <span>Hourly Bookings</span>
             </button>
           </div>
         </div>
 
         {chartView === 'tickets' ? (
-          /* SVG Dynamic 7-Day Spline Chart */
+          /* SVG Dynamic 7-Day Spline Chart from Real PostgreSQL Records */
           <div className="relative pt-2">
             <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 glow-dot-emerald" />
-                  <span className="text-slate-300 font-medium">Resolved Tickets ({compMaint})</span>
+                  <span className="text-slate-300 font-medium">Resolved ({maintenance.completed || 0})</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                  <span className="text-slate-300 font-medium">Reported Volume ({totalMaint})</span>
+                  <span className="text-slate-300 font-medium">Incoming ({maintenance.total || 0})</span>
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">Live Window: Last 7 Days</span>
+              <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">PostgreSQL 7-Day Query</span>
             </div>
 
             {/* SVG Visual Canvas */}
@@ -429,7 +416,7 @@ export default function DashboardOverview({
                 className="absolute z-20 pointer-events-none p-2.5 rounded-xl bg-slate-900 border border-white/20 shadow-xl text-xs space-y-1 transform -translate-x-1/2 -translate-y-full"
                 style={{ left: `${(hoveredPoint.x / chartWidth) * 100}%`, top: '40px' }}
               >
-                <p className="font-bold text-white border-b border-white/10 pb-1">{hoveredPoint.day} Performance</p>
+                <p className="font-bold text-white border-b border-white/10 pb-1">{hoveredPoint.day} ({hoveredPoint.date_str || 'Date'})</p>
                 <div className="flex items-center justify-between gap-3 text-[11px]">
                   <span className="text-emerald-400 font-medium">Resolved:</span>
                   <span className="font-bold text-white">{hoveredPoint.resolved} tickets</span>
@@ -438,53 +425,38 @@ export default function DashboardOverview({
                   <span className="text-blue-400 font-medium">Logged:</span>
                   <span className="font-bold text-white">{hoveredPoint.tickets} tickets</span>
                 </div>
-                <div className="flex items-center justify-between gap-3 text-[11px]">
-                  <span className="text-slate-400">Response:</span>
-                  <span className="font-mono text-cyan-300">{hoveredPoint.latency}ms</span>
-                </div>
               </div>
             )}
           </div>
         ) : (
-          /* Hourly Amenity Heatmap Grid */
+          /* Real Hourly Amenity Distribution from Database */
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between text-xs text-slate-400">
-              <span>Peak Reservation Heatmap by Time Band</span>
-              <span className="text-[11px] font-mono text-indigo-400">Max Concurrency: 4 concurrent slots</span>
+              <span>Actual Reservation Distribution by Time Slot</span>
+              <span className="text-[11px] font-mono text-indigo-400">{amenities.total_bookings || 0} total bookings recorded</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
-              {hourlySlots.map((slot, idx) => {
-                const percent = Math.round((slot.bookings / slot.cap) * 100);
-                const isFull = percent >= 100;
-                return (
+            {hourlyAmenities.length === 0 ? (
+              <div className="py-10 text-center text-xs text-slate-500 glass-panel rounded-xl">
+                No active amenity reservations on record in the database.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                {hourlyAmenities.map((slot, idx) => (
                   <div
                     key={idx}
-                    className={`p-3 rounded-xl border text-center transition-all ${
-                      isFull
-                        ? 'bg-rose-500/10 border-rose-500/30'
-                        : percent >= 50
-                        ? 'bg-amber-500/10 border-amber-500/30'
-                        : 'bg-indigo-500/10 border-indigo-500/20'
-                    }`}
+                    className="p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-center"
                   >
-                    <span className="text-xs font-mono font-bold text-slate-200">{slot.label}</span>
-                    <p className="text-[10px] text-slate-400 truncate mt-0.5">{slot.name}</p>
-                    <div className="w-full bg-slate-900 rounded-full h-1.5 mt-2 overflow-hidden">
-                      <div
-                        className={`h-1.5 rounded-full ${
-                          isFull ? 'bg-rose-500' : percent >= 50 ? 'bg-amber-400' : 'bg-indigo-400'
-                        }`}
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                    <span className={`text-[10px] font-bold mt-1.5 block ${isFull ? 'text-rose-400' : 'text-slate-300'}`}>
-                      {slot.bookings}/{slot.cap} ({percent}%)
+                    <span className="text-xs font-mono font-bold text-slate-200">{slot.slot_time}</span>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Booking Slot</p>
+                    <span className="text-base font-black text-indigo-300 block mt-1">
+                      {slot.booking_count}
                     </span>
+                    <span className="text-[10px] text-slate-400">confirmed</span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -573,7 +545,7 @@ export default function DashboardOverview({
                       stroke="#1e293b"
                       strokeWidth="14"
                     />
-                    {categories.map((cat, idx) => {
+                    {totalCatCount > 0 && categories.map((cat, idx) => {
                       const count = Number(cat.count);
                       const percent = count / totalCatCount;
                       const strokeDash = percent * circumference;

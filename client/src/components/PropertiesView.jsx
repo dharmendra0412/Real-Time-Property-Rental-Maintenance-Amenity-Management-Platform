@@ -50,7 +50,6 @@ export default function PropertiesView({
   });
 
   const occupancyRate = totalUnits > 0 ? Math.round((totalOccupied / totalUnits) * 100) : 0;
-  const estimatedMonthlyGross = totalOccupied * 2450; // $2,450 avg monthly benchmark per unit
 
   // Filter properties
   const filteredProperties = properties.filter((prop) => {
@@ -133,13 +132,13 @@ export default function PropertiesView({
 
         <div className="glass-panel p-4 rounded-2xl border border-white/5">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
-            <span>Gross Monthly Rent</span>
-            <DollarSign className="w-4 h-4 text-amber-400" />
+            <span>Available Vacancy</span>
+            <Home className="w-4 h-4 text-amber-400" />
           </div>
           <span className="text-2xl font-black text-white font-['Outfit']">
-            ${estimatedMonthlyGross.toLocaleString()}
+            {totalVacant}
           </span>
-          <p className="text-[11px] text-emerald-400 font-semibold mt-0.5">Active lease billing</p>
+          <p className="text-[11px] text-amber-400 font-semibold mt-0.5">Ready for lease</p>
         </div>
       </div>
 
@@ -330,8 +329,8 @@ export default function PropertiesView({
                             }
                             className="w-full py-1 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1.5"
                           >
-                            <Receipt className="w-3 h-3 text-emerald-400" />
-                            <span>Digital Rent Statement</span>
+                            <FileText className="w-3 h-3 text-blue-400" />
+                            <span>View Lease Particulars</span>
                           </button>
                         </div>
                       ) : (
@@ -348,7 +347,7 @@ export default function PropertiesView({
         </div>
       )}
 
-      {/* Digital Rent Statement / Invoice Modal */}
+      {/* Tenancy & Lease Particulars Modal */}
       {selectedInvoiceUnit && (
         <div
           onClick={() => setSelectedInvoiceUnit(null)}
@@ -358,15 +357,15 @@ export default function PropertiesView({
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/15 space-y-5 animate-zoom-in"
           >
-            {/* Invoice Header */}
+            {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
-                  <Receipt className="w-5 h-5" />
+                  <Building2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white font-['Outfit']">Digital Rent Statement</h3>
-                  <p className="text-[10px] font-mono text-slate-400">Statement #INV-2026-{selectedInvoiceUnit.id?.slice(-4) || '8821'}</p>
+                  <h3 className="text-base font-bold text-white font-['Outfit']">Resident Tenancy Record</h3>
+                  <p className="text-[10px] font-mono text-slate-400">Unit ID: {selectedInvoiceUnit.id}</p>
                 </div>
               </div>
               <button
@@ -385,29 +384,27 @@ export default function PropertiesView({
                 <p className="text-slate-400 text-[11px] mt-0.5">{selectedInvoiceUnit.property_name}</p>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Unit Details</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Unit Allocation</span>
                 <p className="font-bold text-white text-sm">Unit {selectedInvoiceUnit.unit_number}</p>
                 <p className="text-slate-400 text-[11px] mt-0.5">Floor {selectedInvoiceUnit.floor || 'Ground'}</p>
               </div>
             </div>
 
-            {/* Financial Line Items */}
+            {/* Tenancy Record Details */}
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between py-1.5 border-b border-white/5">
-                <span className="text-slate-300">Base Monthly Residential Rent</span>
-                <span className="font-mono font-semibold text-white">$2,250.00</span>
+              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                <span className="text-slate-400">Complex Address</span>
+                <span className="text-slate-200 font-medium">{selectedInvoiceUnit.property_address}</span>
               </div>
-              <div className="flex items-center justify-between py-1.5 border-b border-white/5">
-                <span className="text-slate-300">Common Area Maintenance & Security</span>
-                <span className="font-mono font-semibold text-white">$150.00</span>
+              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                <span className="text-slate-400">Occupancy Status</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {selectedInvoiceUnit.status}
+                </span>
               </div>
-              <div className="flex items-center justify-between py-1.5 border-b border-white/5">
-                <span className="text-slate-300">Amenity Concierge Access Pass</span>
-                <span className="font-mono font-semibold text-white">$50.00</span>
-              </div>
-              <div className="flex items-center justify-between pt-2 text-sm font-bold">
-                <span className="text-white font-['Outfit']">Total Paid Amount</span>
-                <span className="font-mono text-emerald-400 text-base">$2,450.00</span>
+              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                <span className="text-slate-400">Database Record</span>
+                <span className="text-slate-200 font-mono text-[11px]">PostgreSQL Verified</span>
               </div>
             </div>
 
@@ -415,18 +412,17 @@ export default function PropertiesView({
             <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2 text-emerald-400">
                 <CheckCircle className="w-4 h-4 shrink-0" />
-                <span className="font-bold">PAID - ACID PostgreSQL Verified</span>
+                <span className="font-bold">Active Resident Tenancy</span>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">Ledger Lock Active</span>
+              <span className="text-[10px] font-mono text-slate-400">Row ID Synchronized</span>
             </div>
 
-            {/* Print Action */}
+            {/* Action */}
             <button
-              onClick={() => window.print()}
+              onClick={() => setSelectedInvoiceUnit(null)}
               className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition flex items-center justify-center gap-2"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print or Save PDF Statement</span>
+              <span>Close</span>
             </button>
           </div>
         </div>

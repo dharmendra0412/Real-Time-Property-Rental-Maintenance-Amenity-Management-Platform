@@ -32,11 +32,9 @@ export default function Navbar({
   setSoundEnabled,
   onOpenAuth,
   onLogout,
-  onQuickLogin,
   onOpenCommandPalette,
   onExportReport
 }) {
-  const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const navItems = [
@@ -173,78 +171,6 @@ export default function Navbar({
               {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-blue-400" /> : <VolumeX className="w-3.5 h-3.5 text-slate-500" />}
             </button>
 
-            {/* Desktop Demo Persona Switcher */}
-            <div className="relative shrink-0 hidden sm:block">
-              <button
-                onClick={() => setShowPersonaMenu(!showPersonaMenu)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/10 to-blue-500/10 hover:from-indigo-500/20 hover:to-blue-500/20 border border-indigo-500/25 text-indigo-300 text-xs font-semibold transition shrink-0 whitespace-nowrap"
-              >
-                <Radio className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                <span>Demo Roles</span>
-                <ChevronDown className="w-3 h-3 text-indigo-400 shrink-0" />
-              </button>
-
-              {showPersonaMenu && (
-                <div
-                  className="absolute right-0 mt-2 w-64 rounded-2xl glass-panel p-2 shadow-2xl z-50 animate-slide-up"
-                  onMouseLeave={() => setShowPersonaMenu(false)}
-                >
-                  <div className="px-3 py-1.5 border-b border-white/5 mb-1.5">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Switch Test Persona</p>
-                    <p className="text-[10px] text-slate-500">1-click login without password entry</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      onQuickLogin('dharmesh.owner@realestate.com', 'securepassword123');
-                      setShowPersonaMenu(false);
-                    }}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-xs transition group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-amber-400" />
-                      <div>
-                        <p className="font-semibold text-white group-hover:text-amber-300 transition">Property Owner</p>
-                        <p className="text-[10px] text-slate-400">Dharmesh Sharma</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-amber-400">OWNER</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onQuickLogin('rahul.verma@gmail.com', 'securepassword123');
-                      setShowPersonaMenu(false);
-                    }}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-xs transition group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-emerald-400" />
-                      <div>
-                        <p className="font-semibold text-white group-hover:text-emerald-300 transition">Resident Tenant</p>
-                        <p className="text-[10px] text-slate-400">Rahul Verma (Tower A - 402)</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-emerald-400">TENANT</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onQuickLogin('suresh.tech@services.com', 'securepassword123');
-                      setShowPersonaMenu(false);
-                    }}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-xs transition group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Wrench className="w-4 h-4 text-cyan-400" />
-                      <div>
-                        <p className="font-semibold text-white group-hover:text-cyan-300 transition">Facilities Staff</p>
-                        <p className="text-[10px] text-slate-400">Suresh Kumar (Tech)</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-cyan-400">STAFF</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
             {/* User Profile or Login */}
             {currentUser ? (
               <div className="flex items-center gap-1.5 p-1 pl-1.5 rounded-xl bg-slate-900/80 border border-white/5 shrink-0 whitespace-nowrap">
@@ -346,43 +272,6 @@ export default function Navbar({
                 </button>
               </div>
             )}
-
-            {/* Quick Demo Switcher on Mobile */}
-            <div className="space-y-1.5">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Instant Demo Personas</p>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => {
-                    onQuickLogin('dharmesh.owner@realestate.com', 'securepassword123');
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center"
-                >
-                  <Shield className="w-4 h-4 text-amber-400 mx-auto mb-1" />
-                  <span className="text-[10px] font-bold text-amber-300 block">Owner</span>
-                </button>
-                <button
-                  onClick={() => {
-                    onQuickLogin('rahul.verma@gmail.com', 'securepassword123');
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center"
-                >
-                  <User className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                  <span className="text-[10px] font-bold text-emerald-300 block">Tenant</span>
-                </button>
-                <button
-                  onClick={() => {
-                    onQuickLogin('suresh.tech@services.com', 'securepassword123');
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center"
-                >
-                  <Wrench className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
-                  <span className="text-[10px] font-bold text-cyan-300 block">Staff</span>
-                </button>
-              </div>
-            </div>
 
             {/* Utility Toggles */}
             <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5">

@@ -611,7 +611,7 @@ export default function App() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 glow-dot-emerald" />
-              <span>Zero Mock Simulation</span>
+              <span>PostgreSQL Production Engine</span>
             </span>
             <span>•</span>
             <span>ACID Concurrency Shield</span>

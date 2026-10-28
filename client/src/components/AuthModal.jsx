@@ -551,41 +551,6 @@ export default function AuthModal({
               </div>
             </div>
 
-            {/* Quick Demo Credentials Box */}
-            {mode === 'login' && (
-              <div className="p-3 rounded-2xl bg-slate-900/60 border border-white/5 space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Instant 1-Click Demo Login
-                </p>
-                <div className="grid grid-cols-3 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => onQuickDemo('dharmesh.owner@realestate.com', 'securepassword123')}
-                    className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-center transition group"
-                  >
-                    <Shield className="w-4 h-4 text-amber-400 mx-auto mb-1 group-hover:scale-110 transition" />
-                    <span className="block text-[10px] font-bold text-amber-300">Owner</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onQuickDemo('rahul.verma@gmail.com', 'securepassword123')}
-                    className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-center transition group"
-                  >
-                    <User className="w-4 h-4 text-emerald-400 mx-auto mb-1 group-hover:scale-110 transition" />
-                    <span className="block text-[10px] font-bold text-emerald-300">Tenant</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onQuickDemo('suresh.tech@services.com', 'securepassword123')}
-                    className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 text-center transition group"
-                  >
-                    <Wrench className="w-4 h-4 text-cyan-400 mx-auto mb-1 group-hover:scale-110 transition" />
-                    <span className="block text-[10px] font-bold text-cyan-300">Staff</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Inline Server / Validation Error Notice */}
             {formError && (
               <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 animate-shake">

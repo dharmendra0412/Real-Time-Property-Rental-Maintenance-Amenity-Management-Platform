@@ -147,15 +147,25 @@ export default function MaintenanceView({
           </div>
         </div>
 
-        {/* Title */}
+        {/* Title & SLA Badge */}
         <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition line-clamp-1">
           {ticket.title}
         </h3>
 
-        {/* Unit & Property */}
-        <p className="text-xs text-slate-400 mt-0.5">
-          Unit: <span className="text-slate-200 font-semibold">{ticket.unit_number || 'Resident'}</span> • {ticket.property_name || 'Skyline'}
-        </p>
+        <div className="flex items-center justify-between text-xs text-slate-400 mt-1">
+          <span>
+            Unit: <span className="text-slate-200 font-semibold">{ticket.unit_number || 'Resident'}</span> • {ticket.property_name || 'Skyline'}
+          </span>
+          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+            ticket.priority === 'EMERGENCY'
+              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20 glow-dot-rose'
+              : ticket.priority === 'HIGH'
+              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+              : 'bg-slate-800 text-slate-400'
+          }`}>
+            {ticket.priority === 'EMERGENCY' ? 'SLA: 4h' : ticket.priority === 'HIGH' ? 'SLA: 12h' : 'SLA: 24h'}
+          </span>
+        </div>
 
         {/* Description */}
         <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
@@ -479,20 +489,55 @@ export default function MaintenanceView({
         onClose={() => setAuditLogTicket(null)}
       />
 
-      {/* Lightbox Photo Preview Modal */}
+      {/* Lightbox Photo Preview Modal with High-Res Inspection */}
       {selectedPhoto && (
         <div
           onClick={() => setSelectedPhoto(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-lg animate-fade-in"
         >
-          <div className="relative max-w-4xl max-h-[85vh] rounded-2xl overflow-hidden glass-panel p-2 shadow-2xl">
-            <button
-              onClick={() => setSelectedPhoto(null)}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-black/60 text-white hover:bg-black/90 transition z-10"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <img src={selectedPhoto} alt="Full resolution preview" className="max-w-full max-h-[80vh] rounded-xl object-contain mx-auto" />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl w-full max-h-[90vh] rounded-3xl overflow-hidden glass-panel p-4 shadow-2xl border border-white/15 animate-zoom-in flex flex-col"
+          >
+            {/* Header bar */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+              <div className="flex items-center gap-2">
+                <Camera className="w-4 h-4 text-blue-400" />
+                <span className="font-bold text-white">Maintenance Inspection Photo Evidence</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={selectedPhoto}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold flex items-center gap-1 transition"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open Original</span>
+                </a>
+                <button
+                  onClick={() => setSelectedPhoto(null)}
+                  className="p-1.5 rounded-xl bg-white/10 text-slate-300 hover:text-white hover:bg-white/20 transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Photo Canvas */}
+            <div className="flex-1 overflow-auto py-3 flex items-center justify-center bg-black/40 rounded-2xl my-2">
+              <img
+                src={selectedPhoto}
+                alt="Full resolution preview"
+                className="max-w-full max-h-[70vh] rounded-xl object-contain shadow-2xl transition-all"
+              />
+            </div>
+
+            {/* Footer Notice */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-white/10">
+              <span>ACID Audited Inspection Attachment</span>
+              <span>Click outside or Esc to dismiss</span>
+            </div>
           </div>
         </div>
       )}

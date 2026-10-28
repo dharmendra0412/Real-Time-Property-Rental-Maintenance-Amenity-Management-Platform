@@ -1,0 +1,17 @@
+{
+  "short_name": "Skyline",
+  "name": "Skyline Enterprise - Real-Time Property & Amenity Management",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/"
+}

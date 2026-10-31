@@ -512,12 +512,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Inter'] relative selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen text-slate-800 flex flex-col font-['Inter'] relative selection:bg-sky-500 selection:text-white" style={{ backgroundColor: '#f5f0e8' }}>
       {/* Background Subtle Ambient Glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]" />
-        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-[128px]" />
-        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-cyan-600/10 rounded-full blur-[128px]" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky-400/15 rounded-full blur-[128px]" />
+        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-amber-300/20 rounded-full blur-[128px]" />
+        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-stone-300/30 rounded-full blur-[128px]" />
       </div>
 
       {/* 1. High-End Sticky Navbar */}
@@ -605,7 +605,7 @@ export default function App() {
       </main>
 
       {/* 3. Footer */}
-      <footer className="border-t border-white/5 py-6 bg-slate-950/80 backdrop-blur-md relative z-10 mt-auto mb-16 lg:mb-0">
+      <footer className="border-t border-stone-300/60 py-6 backdrop-blur-md relative z-10 mt-auto mb-16 lg:mb-0" style={{ backgroundColor: 'rgba(245, 240, 232, 0.85)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <p>© 2026 Skyline Enterprise Platform. Certified 100% Pure PostgreSQL Engine.</p>
           <div className="flex items-center gap-4">

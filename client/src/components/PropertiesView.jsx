@@ -73,17 +73,17 @@ export default function PropertiesView({
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-stone-200/60">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-white font-['Outfit']">
-              Properties & Real Estate Assets
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 font-['Outfit']">
+              Properties &amp; Real Estate Assets
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-700 border border-sky-200">
               PHYSICAL ASSETS
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Manage residential complexes, unit occupancies, and resident tenant lease assignments.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function PropertiesView({
         {isOwner && (
           <button
             onClick={() => setShowAddPropertyModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-xs font-semibold text-white shadow-md transition active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Property</span>
@@ -101,44 +101,44 @@ export default function PropertiesView({
 
       {/* Portfolio Overview Stats (4 Cards) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="glass-panel p-4 rounded-2xl border border-white/5">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+        <div className="glass-panel p-4 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
             <span>Total Complexes</span>
             <Building2 className="w-4 h-4 text-blue-400" />
           </div>
-          <span className="text-2xl font-black text-white font-['Outfit']">{totalProperties}</span>
-          <p className="text-[11px] text-slate-400 mt-0.5">Active physical towers</p>
+          <span className="text-2xl font-black text-slate-900 font-['Outfit']">{totalProperties}</span>
+          <p className="text-[11px] text-slate-500 mt-0.5">Active physical towers</p>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-white/5">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+        <div className="glass-panel p-4 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
             <span>Portfolio Units</span>
             <Home className="w-4 h-4 text-indigo-400" />
           </div>
-          <span className="text-2xl font-black text-white font-['Outfit']">{totalUnits}</span>
-          <p className="text-[11px] text-slate-400 mt-0.5">{totalOccupied} Occupied • {totalVacant} Vacant</p>
+          <span className="text-2xl font-black text-slate-900 font-['Outfit']">{totalUnits}</span>
+          <p className="text-[11px] text-slate-500 mt-0.5">{totalOccupied} Occupied • {totalVacant} Vacant</p>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-white/5">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+        <div className="glass-panel p-4 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
             <span>Occupancy Rate</span>
             <Percent className="w-4 h-4 text-emerald-400" />
           </div>
-          <span className="text-2xl font-black text-white font-['Outfit']">{occupancyRate}%</span>
-          <div className="w-full bg-slate-800 rounded-full h-1 mt-1.5 overflow-hidden">
+          <span className="text-2xl font-black text-slate-900 font-['Outfit']">{occupancyRate}%</span>
+          <div className="w-full bg-stone-200 rounded-full h-1 mt-1.5 overflow-hidden">
             <div className="bg-emerald-400 h-1 rounded-full" style={{ width: `${occupancyRate}%` }} />
           </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-white/5">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-semibold mb-1">
+        <div className="glass-panel p-4 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
             <span>Available Vacancy</span>
             <Home className="w-4 h-4 text-amber-400" />
           </div>
-          <span className="text-2xl font-black text-white font-['Outfit']">
+          <span className="text-2xl font-black text-slate-900 font-['Outfit']">
             {totalVacant}
           </span>
-          <p className="text-[11px] text-amber-400 font-semibold mt-0.5">Ready for lease</p>
+          <p className="text-[11px] text-amber-600 font-semibold mt-0.5">Ready for lease</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export default function PropertiesView({
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
                 statusFilter === st
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-stone-100'
               }`}
             >
               {st === 'ALL' ? 'All Portfolios' : st === 'OCCUPIED' ? 'Has Occupancy' : 'Has Vacancies'}
@@ -176,8 +176,8 @@ export default function PropertiesView({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredProperties.length === 0 ? (
           <div className="col-span-full py-16 text-center glass-panel rounded-2xl">
-            <Building2 className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-sm font-semibold text-slate-300">No properties match your filter.</p>
+            <Building2 className="w-10 h-10 text-stone-400 mx-auto mb-3" />
+            <p className="text-sm font-semibold text-slate-700">No properties match your filter.</p>
             <p className="text-xs text-slate-500 mt-1">Try clearing your search query or add a new property.</p>
           </div>
         ) : (
@@ -197,39 +197,39 @@ export default function PropertiesView({
                     <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition">
                       <Building2 className="w-5 h-5" />
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-white/5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-slate-600 border border-stone-200">
                       {units.length} Units ({propOccupancy}%)
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition">
                     {prop.name}
                   </h3>
 
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1 mb-4">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 mb-4">
                     <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-500" />
                     <span className="truncate">{prop.address}, {prop.city}, {prop.state} {prop.zip_code}</span>
                   </div>
 
                   {/* Units Status Grid */}
-                  <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-900/60 border border-white/5 mb-4 text-xs">
+                  <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-stone-50 border border-stone-200 mb-4 text-xs">
                     <div>
-                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Occupied</span>
-                      <p className="text-base font-black text-white">{occupied}</p>
+                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Occupied</span>
+                      <p className="text-base font-black text-slate-900">{occupied}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vacant</span>
-                      <p className="text-base font-black text-white">{vacant}</p>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vacant</span>
+                      <p className="text-base font-black text-slate-900">{vacant}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+                <div className="pt-3 border-t border-stone-200/60 flex items-center justify-between">
                   <button
                     onClick={() => onSelectProperty(prop.id)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700 transition"
                   >
-                    <span>View Units & Leases</span>
+                    <span>View Units &amp; Leases</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
 
@@ -239,7 +239,7 @@ export default function PropertiesView({
                         setTargetPropertyId(prop.id);
                         setShowAddUnitModal(true);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-slate-300 transition"
+                      className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-[11px] font-semibold text-slate-600 transition"
                     >
                       + Add Unit
                     </button>
@@ -254,18 +254,18 @@ export default function PropertiesView({
       {/* Selected Property Detail Modal / Unit Drawer */}
       {selectedProperty && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-3xl glass-panel rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto border border-white/10">
+          <div className="w-full max-w-3xl glass-panel rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto border border-stone-200">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-black text-white font-['Outfit']">{selectedProperty.name}</h2>
-                <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                <h2 className="text-xl font-black text-slate-900 font-['Outfit']">{selectedProperty.name}</h2>
+                <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
                   <MapPin className="w-3.5 h-3.5 text-slate-500" />
                   {selectedProperty.address}, {selectedProperty.city}, {selectedProperty.state}
                 </p>
               </div>
               <button
                 onClick={() => onSelectProperty(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition"
+                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-stone-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -274,7 +274,7 @@ export default function PropertiesView({
             {/* Units Table / Grid */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-200">Registered Residential Units & Tenancy</h3>
+                <h3 className="text-sm font-bold text-slate-800">Registered Residential Units &amp; Tenancy</h3>
                 {isOwner && (
                   <button
                     onClick={() => {
@@ -297,10 +297,10 @@ export default function PropertiesView({
                   selectedProperty.units.map((unit) => (
                     <div
                       key={unit.id}
-                      className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/5 space-y-2.5 text-xs hover:border-white/15 transition"
+                      className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2.5 text-xs hover:border-stone-300 transition"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white text-sm">{unit.unit_number}</span>
+                        <span className="font-bold text-slate-900 text-sm">{unit.unit_number}</span>
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                             unit.status === 'OCCUPIED'
@@ -311,11 +311,11 @@ export default function PropertiesView({
                           {unit.status}
                         </span>
                       </div>
-                      <p className="text-slate-400 text-[11px]">Floor {unit.floor || 'Ground'}</p>
+                      <p className="text-slate-500 text-[11px]">Floor {unit.floor || 'Ground'}</p>
 
                       {unit.tenant_name ? (
-                        <div className="pt-2 border-t border-white/5 space-y-2">
-                          <div className="flex items-center gap-1.5 text-slate-300">
+                        <div className="pt-2 border-t border-stone-200 space-y-2">
+                          <div className="flex items-center gap-1.5 text-slate-700">
                             <Users className="w-3.5 h-3.5 text-blue-400" />
                             <span className="truncate font-semibold">{unit.tenant_name}</span>
                           </div>
@@ -327,14 +327,14 @@ export default function PropertiesView({
                                 property_address: `${selectedProperty.address}, ${selectedProperty.city}`
                               })
                             }
-                            className="w-full py-1 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1.5"
+                            className="w-full py-1 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-[11px] font-semibold text-slate-600 transition flex items-center justify-center gap-1.5"
                           >
                             <FileText className="w-3 h-3 text-blue-400" />
                             <span>View Lease Particulars</span>
                           </button>
                         </div>
                       ) : (
-                        <div className="pt-2 border-t border-white/5 text-[11px] text-slate-500 italic">
+                        <div className="pt-2 border-t border-stone-200 text-[11px] text-slate-500 italic">
                           Vacant / Ready for Lease
                         </div>
                       )}
@@ -355,56 +355,56 @@ export default function PropertiesView({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/15 space-y-5 animate-zoom-in"
+            className="w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-stone-200 space-y-5 animate-zoom-in"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-200">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white font-['Outfit']">Resident Tenancy Record</h3>
-                  <p className="text-[10px] font-mono text-slate-400">Unit ID: {selectedInvoiceUnit.id}</p>
+                  <h3 className="text-base font-bold text-slate-900 font-['Outfit']">Resident Tenancy Record</h3>
+                  <p className="text-[10px] font-mono text-slate-500">Unit ID: {selectedInvoiceUnit.id}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedInvoiceUnit(null)}
-                className="p-1.5 rounded-xl bg-white/10 text-slate-300 hover:text-white"
+                className="p-1.5 rounded-xl bg-stone-100 text-slate-600 hover:text-slate-900"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Tenancy Particulars */}
-            <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-white/5 text-xs">
+            <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase">Resident Tenant</span>
-                <p className="font-bold text-white text-sm">{selectedInvoiceUnit.tenant_name}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">{selectedInvoiceUnit.property_name}</p>
+                <p className="font-bold text-slate-900 text-sm">{selectedInvoiceUnit.tenant_name}</p>
+                <p className="text-slate-500 text-[11px] mt-0.5">{selectedInvoiceUnit.property_name}</p>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase">Unit Allocation</span>
-                <p className="font-bold text-white text-sm">Unit {selectedInvoiceUnit.unit_number}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">Floor {selectedInvoiceUnit.floor || 'Ground'}</p>
+                <p className="font-bold text-slate-900 text-sm">Unit {selectedInvoiceUnit.unit_number}</p>
+                <p className="text-slate-500 text-[11px] mt-0.5">Floor {selectedInvoiceUnit.floor || 'Ground'}</p>
               </div>
             </div>
 
             {/* Tenancy Record Details */}
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between py-2 border-b border-white/5">
-                <span className="text-slate-400">Complex Address</span>
-                <span className="text-slate-200 font-medium">{selectedInvoiceUnit.property_address}</span>
+              <div className="flex items-center justify-between py-2 border-b border-stone-200">
+                <span className="text-slate-500">Complex Address</span>
+                <span className="text-slate-700 font-medium">{selectedInvoiceUnit.property_address}</span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-white/5">
-                <span className="text-slate-400">Occupancy Status</span>
+              <div className="flex items-center justify-between py-2 border-b border-stone-200">
+                <span className="text-slate-500">Occupancy Status</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   {selectedInvoiceUnit.status}
                 </span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-white/5">
-                <span className="text-slate-400">Database Record</span>
-                <span className="text-slate-200 font-mono text-[11px]">PostgreSQL Verified</span>
+              <div className="flex items-center justify-between py-2 border-b border-stone-200">
+                <span className="text-slate-500">Database Record</span>
+                <span className="text-slate-700 font-mono text-[11px]">PostgreSQL Verified</span>
               </div>
             </div>
 
@@ -414,13 +414,13 @@ export default function PropertiesView({
                 <CheckCircle className="w-4 h-4 shrink-0" />
                 <span className="font-bold">Active Resident Tenancy</span>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">Row ID Synchronized</span>
+              <span className="text-[10px] font-mono text-slate-500">Row ID Synchronized</span>
             </div>
 
             {/* Action */}
             <button
               onClick={() => setSelectedInvoiceUnit(null)}
-              className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-slate-700 transition flex items-center justify-center gap-2"
             >
               <span>Close</span>
             </button>
@@ -431,12 +431,12 @@ export default function PropertiesView({
       {/* Add Property Modal */}
       {showAddPropertyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md glass-panel rounded-3xl p-6 shadow-2xl space-y-4 border border-white/10">
+          <div className="w-full max-w-md glass-panel rounded-3xl p-6 shadow-2xl space-y-4 border border-stone-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Add Physical Property</h3>
+              <h3 className="text-base font-bold text-slate-900">Add Physical Property</h3>
               <button
                 onClick={() => setShowAddPropertyModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white transition"
+                className="p-1 rounded-lg text-slate-500 hover:text-slate-900 transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -458,7 +458,7 @@ export default function PropertiesView({
               className="space-y-3 text-xs"
             >
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Property / Tower Name</label>
+                <label className="block text-slate-700 font-semibold mb-1">Property / Tower Name</label>
                 <input
                   name="name"
                   required
@@ -467,7 +467,7 @@ export default function PropertiesView({
                 />
               </div>
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Street Address</label>
+                <label className="block text-slate-700 font-semibold mb-1">Street Address</label>
                 <input
                   name="address"
                   required
@@ -477,7 +477,7 @@ export default function PropertiesView({
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">City</label>
+                  <label className="block text-slate-700 font-semibold mb-1">City</label>
                   <input
                     name="city"
                     required
@@ -486,7 +486,7 @@ export default function PropertiesView({
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">State</label>
+                  <label className="block text-slate-700 font-semibold mb-1">State</label>
                   <input
                     name="state"
                     required
@@ -495,7 +495,7 @@ export default function PropertiesView({
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Zip Code</label>
+                  <label className="block text-slate-700 font-semibold mb-1">Zip Code</label>
                   <input
                     name="zip_code"
                     required
@@ -508,7 +508,7 @@ export default function PropertiesView({
                 <button
                   type="button"
                   onClick={() => setShowAddPropertyModal(false)}
-                  className="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white transition"
+                  className="px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition"
                 >
                   Cancel
                 </button>
@@ -527,12 +527,12 @@ export default function PropertiesView({
       {/* Add Unit Modal */}
       {showAddUnitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-sm glass-panel rounded-3xl p-6 shadow-2xl space-y-4 border border-white/10">
+          <div className="w-full max-w-sm glass-panel rounded-3xl p-6 shadow-2xl space-y-4 border border-stone-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Add Residential Unit</h3>
+              <h3 className="text-base font-bold text-slate-900">Add Residential Unit</h3>
               <button
                 onClick={() => setShowAddUnitModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white transition"
+                className="p-1 rounded-lg text-slate-500 hover:text-slate-900 transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -551,7 +551,7 @@ export default function PropertiesView({
               className="space-y-3 text-xs"
             >
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Unit Number / Flat #</label>
+                <label className="block text-slate-700 font-semibold mb-1">Unit Number / Flat #</label>
                 <input
                   name="unit_number"
                   required
@@ -560,7 +560,7 @@ export default function PropertiesView({
                 />
               </div>
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Floor Level</label>
+                <label className="block text-slate-700 font-semibold mb-1">Floor Level</label>
                 <input
                   name="floor"
                   type="number"
@@ -572,7 +572,7 @@ export default function PropertiesView({
                 <button
                   type="button"
                   onClick={() => setShowAddUnitModal(false)}
-                  className="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white transition"
+                  className="px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition"
                 >
                   Cancel
                 </button>
